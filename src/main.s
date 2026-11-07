@@ -1,19 +1,3 @@
-
-;some of these defined variables are not used
-CONTROL_OUTPUT = $20
-COLOR_VALUE = $21
-TEST_VALUE = $13
-PPUCTRL   = $2000
-PPUMASK   = $2001
-PPUSTATUS = $2002
-PPUADDR   = $2006
-PPUDATA   = $2007
-
-;video helper https://www.youtube.com/watch?v=V5uWqdK92i0&t=47s
-
-
-
-
 .segment "HEADER";mesen helper, specifying memory layout and some other stuff
 
     ; iNES header
@@ -61,9 +45,8 @@ reset:
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
-
-    txa
+;we need to wait for the PPU to finish warming up anyway for 30000 cycles or something, so we use some of that waiting time to do useful work 
+;that is why we clear zero our memory between two first blanks
 ClearMemory: ;0000 - 07ff
     sta $0000, x
     sta $0100, x
@@ -76,8 +59,7 @@ ClearMemory: ;0000 - 07ff
 
     ;0200 - very frequently used for storing OAM data so in order to have it resetted
     ;it needs to contain FF and not 00 because 0 0 means 0 for x pos and y pos
-    ;but ff gets handled that if x or y is ff then it is not rendered
-    ; https://www.nesdev.org/wiki/PPU_OAM
+    ;but ff gets handled that if y is 239 or higher then sprite is not rendered
     lda #$ff
     sta $0200, x
     lda #$00
@@ -86,16 +68,14 @@ ClearMemory: ;0000 - 07ff
     inx 
     cpx #$00
     bne ClearMemory
+
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;      WAITING FOR VBLANK         ;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 :
-    ;reading vblank flag into a register, if it is one it gets stored in 7 bit
-                    ; accumulator which then is interpreted as negative value
-                    ;so we are checking if there is no vblank thus bpl    
     bit $2002
-    bpl :- ; we are coming back to the current anonymous label
-
+    bpl :- 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
@@ -172,9 +152,9 @@ SpriteData:
 
 .segment "VECTORS"
 
-    .word nmi
-    .word reset
-    .word irq
+    .addr nmi
+    .addr reset
+    .addr irq
 
 
 .segment "CHARS"
