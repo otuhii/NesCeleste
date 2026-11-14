@@ -25,6 +25,12 @@ game_info:
     .res 2
 player: 
     .res 4
+previous_frame_controller:
+    .res 1
+current_frame_controller:
+    .res 1
+selected_animation: ; 16 bit address to rom predefined animation oam layouts
+     .res 2
 
 
 .segment "VECTORS"
@@ -39,13 +45,20 @@ player:
 
 
 .include "player.s"
+.include "input_handling.s"
 .include "startup.s"
 
 
-
 main_loop:
+    jsr read_controller
+
+    jsr update_player_physics
+    jsr select_player_animation
+    jsr update_player_state
+    jsr update_player_animation
 
     jmp main_loop
+
 
 
 
