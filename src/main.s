@@ -19,10 +19,12 @@
 
 
 .segment "ZEROPAGE"
-game_info: ;intitial game data
+;intitial game data
+;should remain constant over time, used for level reseting after player death
+game_info: 
     .res 2
 player: 
-    .res 2
+    .res 4
 
 
 .segment "VECTORS"

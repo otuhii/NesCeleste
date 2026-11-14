@@ -88,7 +88,7 @@ clear_memory: ;0000 - 07ff
 ; setting up sprite range
 ;4014 - highest byte of the oam ram address, which tells the ppu that
 ;starting from that address, copy next 256 bytes, which in this case is $0200 - $02ff
-lda #$02
+lda #OAM_PAGE
 sta $4014
 
 
