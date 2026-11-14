@@ -1,3 +1,27 @@
+load_rom_data:
+    ;loading initial game info from rom to zero page ram game_info
+    lda initial_game_info + SPAWN_POSITION_X
+    sta game_info + SPAWN_POSITION_X
+    lda initial_game_info + SPAWN_POSITION_Y
+    sta game_info + SPAWN_POSITION_Y
+
+
+
+    ;loading palette data onto ppu
+    ldx #$00
+    @load_palettes:
+        lda palette_data, x
+        sta $2007 ; data register for ppu writes
+                ;every time we read/write from/into the ppu address that we specified
+                ;this address gets increased by one byte so second write cycle we will write into 3f01
+        inx
+        cpx #$20 ; 32 possible palettes
+        bne @load_palettes
+
+    rts
+
+
+
 reset:
     sei
     cld
@@ -23,14 +47,14 @@ reset:
                     ; accumulator which then is interpreted as negative value
                     ;so we are checking if there is no vblank thus bpl    
     bit $2002
-    bpl :- ; we are coming back to the current anonymous label
+    bpl :- 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;we need to wait for the PPU to finish warming up anyway for 30000 cycles or something, so we use some of that waiting time to do useful work 
 ;that is why we clear zero our memory between two first blanks
 lda #$00
-ClearMemory: ;0000 - 07ff
+clear_memory: ;0000 - 07ff
     sta $0000, x
     sta $0100, x
     sta $0300, x
@@ -39,10 +63,8 @@ ClearMemory: ;0000 - 07ff
     sta $0600, x
     sta $0700, x
     
-
-    ;0200 - very frequently used for storing OAM data so in order to have it resetted
-    ;it needs to contain FF and not 00 because 0 0 means 0 for x pos and y pos
-    ;but ff gets handled that if y is 239 or higher then sprite is not rendered
+    ;zeroing with ff because when y is bigger\
+    ; than 240 in dec it hides the sprite from the screen
     lda #$ff
     sta $0200, x
     lda #$00
@@ -50,8 +72,7 @@ ClearMemory: ;0000 - 07ff
 
     inx 
     cpx #$00
-    bne ClearMemory
-
+    bne clear_memory
 
 
 ;The first VBlank alone isn't a sufficient guarantee that the PPU is fully initialized
@@ -71,7 +92,6 @@ lda #$02
 sta $4014
 
 
-
 ; setting up color pallete info
 lda #$3f ;$3f00 - starting address of pallete ppu memory region
 sta $2006 ;2006 - ppu read/write address - it requires two writes
@@ -79,25 +99,11 @@ lda #$00                                  ; order - most and then least
 sta $2006
 
 
-;loading palette data onto ppu
-ldx #$00
-LoadPalettes:
-    lda PaletteData, x
-    sta $2007 ; data register for ppu writes
-                ;every time we read/write from/into the ppu address that we specified
-                ;this address gets increased by one byte so second write cycle we will write into 3f01
-    inx
-    cpx #$20 ; 32 possible palettes
-    bne LoadPalettes
+jsr load_rom_data
 
-;loading object attribute memory data into our ram
-ldx #$00
-LoadSprites:
-    lda SpriteData, x
-    sta $0200, x
-    inx
-    cpx #$10 ; i am loading 4 sprite objects, one sprite object is 4 bytes so 16 bytes in totale 
-    bne LoadSprites
+jsr initialize_player
+
+
 
 ; proceed with setting up some other values for ppu
 cli

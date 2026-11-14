@@ -1,3 +1,6 @@
+.include "globals.s"
+
+
 .segment "HEADER";mesen helper, specifying memory layout and some other stuff
 
     ; iNES header
@@ -14,6 +17,14 @@
     .byte $00, $00, $00, $00
 
 
+
+.segment "ZEROPAGE"
+game_info: ;intitial game data
+    .res 2
+player: 
+    .res 2
+
+
 .segment "VECTORS"
 
     .addr nmi
@@ -24,38 +35,26 @@
 
 .segment "CODE"
 
-.include "globals.s"
+
+.include "player.s"
 .include "startup.s"
 
 
 
-forever:
-    jmp forever
+main_loop:
+
+    jmp main_loop
 
 
-nmi:
-    lda #$02
-    sta $4014
-
-    rti ; return from interupt, like rts
 
 irq:
-    rti ; return from interupt, like rts
-
-PaletteData:
-	.byte $00, $0F, $00, $10, 	$00, $0A, $15, $01, 	$00, $29, $28, $27, 	$00, $34, $24, $14 	;background palettes
-	.byte $31, $0F, $15, $30, 	$00, $0F, $11, $30, 	$00, $0F, $30, $27, 	$00, $3C, $2C, $1C 	;sprite palettes
-
-
-;y, tile index from pattern table, attributes, X
-SpriteData:
-    .byte $40, $d1, $00, $40
-    .byte $40, $d2, $00, $48
-    .byte $48, $e1, $00, $40
-    .byte $48, $e2, $00, $48
+    rti ;nothing to do
 
 
 
+.include "nmi.s"
+
+.include "rom_data.s"
 
 .segment "CHARS"
-    .incbin "visual_data/rom.chr"
+    .incbin "visual_data/celeste.chr"
