@@ -10,8 +10,8 @@
 
 std::string g_WindowTitle{ "NES Level Editor" };
 
-float g_WindowWidth{ 1600.f };
-float g_WindowHeight{ 1600.f };
+float g_WindowWidth{ 2000.f };
+float g_WindowHeight{ 1000.f };
 
 
 #pragma endregion gameInformation

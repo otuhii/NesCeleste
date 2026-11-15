@@ -27,13 +27,12 @@ void Draw()
 	// 	Point2f{50.f, 50.f},
 	// 	Point2f{50.f+g_pattern_table_menu_size, 50.f+g_pattern_table_menu_size}
 	// );
-	SetColor(1.f, 1.f, 0.f, 1.f);
-	DrawRect(g_editor_layout.loadButton, 3.f);
-	DrawRect(g_editor_layout.saveButton, 3.f);
-	DrawRect(g_editor_layout.patternButton, 3.f);
-	DrawRect(g_editor_layout.nametable1, 3.f);
-	DrawRect(g_editor_layout.nametable2, 3.f);
-
+	SetColor(1.f, 0.f, 0.f, 1.f);
+	FillRect(g_editor_layout.loadButton);
+	SetColor(0.f, 1.f, 0.f, 1.f);
+	FillRect(g_editor_layout.saveButton);
+	SetColor(0.f, 0.f, 1.f, 1.f);
+	FillRect(g_editor_layout.patternButton);
 }
 
 void Update(float elapsedSec)
@@ -50,45 +49,104 @@ void End()
 
 #pragma region inputHandling
 
-// Called once when a key is pressed.
 void OnKeyDownEvent(SDL_Keycode key)
 {
 
 }
 
-// Called once when a key is released.
 void OnKeyUpEvent(SDL_Keycode key)
 {
 }
 
-// Called whenever the mouse moves.
 void OnMouseMotionEvent(const SDL_MouseMotionEvent& e)
 {
 
 }
 
-// Called once when a mouse button is pressed.
 void OnMouseDownEvent(const SDL_MouseButtonEvent& e)
 {
 
 }
 
-// Called once when a mouse button is released.
 void OnMouseUpEvent(const SDL_MouseButtonEvent& e)
 {
 }
 
+
+
+//vibe coded layout jumpscare
 EditorLayout CalculateEditorLayout()
 {
 	EditorLayout layout{};
 
-	const float
-		nametable_width{g_WindowWidth*0.5f};
-	const float
-		nametable_height{0.7f*g_WindowHeight};
+	const float margin{20.f};
 
-	layout.nametable1 = Rectf{0, 0, nametable_width, nametable_height};
-	layout.nametable2 = Rectf{nametable_width, 0, nametable_width, nametable_height};
+	const float buttonWidth{120.f};
+	const float buttonHeight{40.f};
+
+	const float nesWidth{256.f};
+	const float nesHeight{240.f};
+
+	const float windowWidth{g_WindowWidth};
+	const float windowHeight{g_WindowHeight};
+
+	const float availableWidth{
+		windowWidth - 2.f * margin
+	};
+
+	const float availableHeight{
+		windowHeight - 2.f * margin - buttonHeight
+	};
+
+	const float scale{
+		std::max(0.f, std::min(
+			availableWidth / (2.f * nesWidth),
+			availableHeight / nesHeight
+		))
+	};
+
+	const float tableWidth{nesWidth * scale};
+	const float tableHeight{nesHeight * scale};
+
+	const float totalWidth{2.f * tableWidth };
+	const float startX{(windowWidth - totalWidth) * 0.5f};
+
+	layout.nametable1 = Rectf{
+		startX,
+		margin,
+		tableWidth,
+		tableHeight
+	};
+
+	layout.nametable2 = Rectf{
+		startX + tableWidth,
+		margin,
+		tableWidth,
+		tableHeight
+	};
+
+	const float buttonY{margin + tableHeight };
+
+	layout.loadButton = Rectf{
+		startX,
+		buttonY,
+		buttonWidth,
+		buttonHeight
+	};
+
+	layout.saveButton = Rectf{
+		startX + buttonWidth,
+		buttonY,
+		buttonWidth,
+		buttonHeight
+	};
+
+	layout.patternButton = Rectf{
+		startX + 2.f * (buttonWidth),
+		buttonY,
+		buttonWidth,
+		buttonHeight
+	};
 
 	return layout;
 }
