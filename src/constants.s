@@ -3,7 +3,8 @@
 PLAYER_X                = 0
 PLAYER_Y                = 1
 ;bautiful two's complement - https://www.youtube.com/watch?v=mEsAsRjeqto
-PLAYER_VELOCITY_X       = 2 ;signed integer
+PLAYER_VELOCITY_X       = 2 ;signed integer - need to move later to fixed point numbers 
+                                                ;that would be stored in two bytes i guess: one for frac and one for int 
 PLAYER_VELOCITY_Y       = 3 ;signed integer
 PLAYER_PREVIOUS_STATE   = 4
 PLAYER_CURRENT_STATE    = 5

@@ -31,6 +31,8 @@ current_frame_controller:
     .res 1
 selected_animation: ; 16 bit address to rom predefined animation oam layouts
     .res 2
+selected_hair_animation:
+    .res 2
 new_frame_starts:
     .res 1
 
