@@ -1,10 +1,9 @@
 load_rom_data:
-    ;loading initial game info from rom to zero page ram game_info
+    ;loading initial game info from rom to zero page ram game_info, why do that? idk
     lda initial_game_info + SPAWN_POSITION_X
     sta game_info + SPAWN_POSITION_X
     lda initial_game_info + SPAWN_POSITION_Y
     sta game_info + SPAWN_POSITION_Y
-
 
 
     ;loading palette data onto ppu
@@ -103,7 +102,8 @@ jsr load_rom_data
 
 jsr initialize_player
 
-
+lda #$00
+sta new_frame_starts
 
 ; proceed with setting up some other values for ppu
 cli

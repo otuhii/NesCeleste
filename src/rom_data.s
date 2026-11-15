@@ -26,7 +26,6 @@ idle_frames:
     .byte TILE_IDLE_1_TL, TILE_IDLE_1_TR
     .byte TILE_IDLE_1_BL, TILE_IDLE_1_BR
 
-
 run_frames:
     .byte TILE_RUN_0_TL, TILE_RUN_0_TR
     .byte TILE_RUN_0_BL, TILE_RUN_0_BR
@@ -39,7 +38,6 @@ run_frames:
 
     .byte TILE_RUN_3_TL, TILE_RUN_3_TR
     .byte TILE_RUN_3_BL, TILE_RUN_3_BR
-
 
 jump_frames:
     .byte TILE_JUMP_TL, TILE_JUMP_TR
@@ -57,7 +55,6 @@ crouch_frames:
     .byte TILE_CROUCH_TL, TILE_CROUCH_TR
     .byte TILE_CROUCH_BL, TILE_CROUCH_BR
 
-
 idle_hair_frames:
     .byte TILE_HAIR_IDLE_TL, TILE_HAIR_IDLE_TR
     .byte TILE_HAIR_IDLE_BL, TILE_HAIR_IDLE_BR
@@ -69,3 +66,14 @@ fall_hair_frames:
 dash_hair_frames:
     .byte TILE_HAIR_DASH_TL, TILE_HAIR_DASH_TR
     .byte TILE_HAIR_DASH_BL, TILE_HAIR_DASH_BR
+
+
+idle_frame_count:
+    .byte 2
+idle_frame_duration:
+    .byte 20
+
+run_frame_count:
+    .byte 4
+run_frame_duration:
+    .byte 10

@@ -1,13 +1,16 @@
 ; helpes to address different fields in player - player part in zero page
 ;       index via player + PLAYER_X to get access to x position e.g
-PLAYER_X      = 0
-PLAYER_Y      = 1
-PLAYER_STATE  = 2
-PLAYER_FRAME  = 3
+PLAYER_X                = 0
+PLAYER_Y                = 1
+PLAYER_PREVIOUS_STATE   = 2
+PLAYER_CURRENT_STATE    = 3
+PLAYER_FRAME            = 4
+PLAYER_MAX_FRAME_COUNT  = 5
+PLAYER_ANIM_TIMER       = 6
+PLAYER_ANIM_DURATION    = 7
 
 
-
-STATE_IDLE   = 0
+STATE_IDLE      = 0
 STATE_RUNNING   = 1
 STATE_JUMPING   = 2
 STATE_FALLING   = 3

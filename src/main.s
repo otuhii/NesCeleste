@@ -1,4 +1,4 @@
-.include "globals.s"
+.include "constants.s"
 
 
 .segment "HEADER";mesen helper, specifying memory layout and some other stuff
@@ -24,13 +24,15 @@
 game_info: 
     .res 2
 player: 
-    .res 4
+    .res 8
 previous_frame_controller:
     .res 1
 current_frame_controller:
     .res 1
 selected_animation: ; 16 bit address to rom predefined animation oam layouts
-     .res 2
+    .res 2
+new_frame_starts:
+    .res 1
 
 
 .segment "VECTORS"
@@ -50,11 +52,16 @@ selected_animation: ; 16 bit address to rom predefined animation oam layouts
 
 
 main_loop:
-    jsr read_controller
+    jsr wait_for_frame ; uppdating everything once per frame
 
+    jsr read_controller
     jsr update_player_physics
-    jsr select_player_animation
+
     jsr update_player_state
+    jsr update_player_state_info
+
+    jsr select_player_animation
+    jsr advance_player_animation
     jsr update_player_animation
 
     jmp main_loop
@@ -68,6 +75,7 @@ irq:
 
 
 .include "nmi.s"
+.include "sync.s"
 
 .include "rom_data.s"
 

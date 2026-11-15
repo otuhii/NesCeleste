@@ -1,5 +1,11 @@
 nmi:
-    lda #$02
+    pha
+
+    lda #$01
+    sta new_frame_starts
+
+    lda #OAM_PAGE
     sta $4014
 
-    rti ; return from interupt, like rts
+    pla
+    rti 
