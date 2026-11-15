@@ -2,12 +2,18 @@
 ;       index via player + PLAYER_X to get access to x position e.g
 PLAYER_X                = 0
 PLAYER_Y                = 1
-PLAYER_PREVIOUS_STATE   = 2
-PLAYER_CURRENT_STATE    = 3
-PLAYER_FRAME            = 4
-PLAYER_MAX_FRAME_COUNT  = 5
-PLAYER_ANIM_TIMER       = 6
-PLAYER_ANIM_DURATION    = 7
+;bautiful two's complement - https://www.youtube.com/watch?v=mEsAsRjeqto
+PLAYER_VELOCITY_X       = 2 ;signed integer
+PLAYER_VELOCITY_Y       = 3 ;signed integer
+PLAYER_PREVIOUS_STATE   = 4
+PLAYER_CURRENT_STATE    = 5
+PLAYER_FRAME            = 6
+PLAYER_MAX_FRAME_COUNT  = 7
+PLAYER_ANIM_TIMER       = 8
+PLAYER_ANIM_DURATION    = 9
+PLAYER_FLAGS            = 10
+;0      0       0       0       0       0       0       0
+;                                                      facing dir: 1 - facing left, 0 - facing right
 
 
 STATE_IDLE      = 0

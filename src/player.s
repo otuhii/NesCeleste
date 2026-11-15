@@ -9,18 +9,43 @@ initialize_player:
     ;reseting player stuff
     lda #STATE_IDLE
     sta player + PLAYER_CURRENT_STATE
+    lda #$ff
+    sta player + PLAYER_PREVIOUS_STATE ; so we can use update_player_state_info and it wont skip the initialization
+                                        ;because state comparisons wont succeed for sure
     lda #$00
     sta player + PLAYER_FRAME
-    ;initial animation info set
-    lda idle_frame_count
-    sta player + PLAYER_MAX_FRAME_COUNT
-    lda idle_frame_duration
-    sta player + PLAYER_ANIM_DURATION
+    sta player + PLAYER_VELOCITY_X
+    sta player + PLAYER_VELOCITY_Y
+    sta player + PLAYER_FLAGS
+    sta player + PLAYER_ANIM_TIMER
 
 
-    jsr initialize_base_player_oam
+    jsr update_player_state_info
+    jsr select_player_animation
+    jsr update_player_oam
     
     rts
+
+
+
+
+
+update_player:
+    jsr update_player_facing
+
+
+    jsr update_player_state
+    jsr update_player_state_info
+
+    jsr advance_player_animation
+    jsr select_player_animation
+
+
+    jsr update_player_oam
+
+    rts
+
+
 
 
 update_player_state:
@@ -89,14 +114,6 @@ update_player_state_info:
 
     @done:
         rts
-
-
-update_player_physics:
-
-    rts
-
-
-
 
 
 select_player_animation:
@@ -182,10 +199,101 @@ advance_player_animation:
         rts
 
 
+update_player_facing:
+    lda player + PLAYER_VELOCITY_X
+
+    beq @done
+    
+    and #%10000000 ;checking sign of the velocity: if 1 it is negative value
+    bne @left 
+
+    @right:
+        lda player + PLAYER_FLAGS
+        and #%11111110
+        sta player + PLAYER_FLAGS
+        rts
+
+    @left:
+        lda player + PLAYER_FLAGS
+        ora #%00000001
+        sta player + PLAYER_FLAGS
+    @done:
+        rts 
 
 
-update_player_animation:
-;for any state other than idle and running anim frame should be 0 !!
+
+
+
+update_player_oam:
+    ;oam contains this order [top left] [top right] [bottom left] [bottom right]
+    jsr update_player_oam_positions
+    jsr update_player_oam_attributes
+    jsr update_player_oam_tiles
+
+    rts
+
+
+
+update_player_oam_positions:
+    ;left column
+    lda player + PLAYER_X
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 3
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 11
+
+    ;right column
+    clc
+    adc #$8
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 7
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 15
+
+    ;top row
+    lda player + PLAYER_Y
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 0
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 4
+
+    ;bottom row
+    clc
+    adc #8
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 8
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 12
+
+    rts
+
+
+
+update_player_oam_attributes:
+    ;;NEED TO TAKE PALLETES INTO ACCOUNT! 
+    ; for now only changing horizontal flipping so just hardcoding the flipping if facing is left
+    lda player + PLAYER_FLAGS
+    and #%00000001
+    beq @right
+
+    @left:
+        lda #%01000000
+        jmp @store
+    @right:
+        lda #$0
+
+    @store:
+        sta OAM_BUFFER_RAM+OAM_PLAYER_POS+2
+        sta OAM_BUFFER_RAM+OAM_PLAYER_POS+6
+        sta OAM_BUFFER_RAM+OAM_PLAYER_POS+14
+        sta OAM_BUFFER_RAM+OAM_PLAYER_POS+10
+
+        rts
+
+
+
+update_player_oam_tiles:
+; indices for facing right are these
+; [0] [1]
+; [2] [3]
+; and indices for facing left are these
+; [1] [0]
+; [3] [2]
+; with horizontal flipping in attributes
+; attribute flipping happens in update_player_oam_attributes
+; and here we swap tiles
     lda player + PLAYER_FRAME
                     ;as one frame is 4 bytes of info, our offset per one anim frame 
                     ;should be frame counter * 4
@@ -193,85 +301,47 @@ update_player_animation:
     asl             ; A *= 2 
     tay             ; X = frame * 4 
 
-    lda (selected_animation),y
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 1; Top-left tile index
-
-    iny
-    lda (selected_animation),y
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 5; Top-right tile index
-
-    iny
-    lda (selected_animation),y
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 9; Bottom-left tile index
-
-    iny
-    lda (selected_animation),y
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + $D; Bottom-right tile index
-
-    rts
+    lda player + PLAYER_FLAGS
+    and #%00000001 ; because last bit of flags is responsible for flipping
+    bne @facing_left
 
 
+    @facing_right:
+        lda (selected_animation),y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 1; Top-left tile index
 
+        iny
+        lda (selected_animation),y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 5; Top-right tile index
 
-initialize_base_player_oam:
-    ;;NEED TO TAKE PALLETES INTO ACCOUNT! 
-    ;oam contains this order [top left] [top right] [bottom left] [bottom right]
-    
+        iny
+        lda (selected_animation),y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 9; Bottom-left tile index
 
-    ;loading empty attribute
-    lda #$00
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+2
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+6
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+14
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+10
+        iny
+        lda (selected_animation),y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 13; Bottom-right tile index
 
-    ;loading tile indices
-    lda idle_frames
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+1
-    lda idle_frames+1
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+5
-    lda idle_frames+2
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+9
-    lda idle_frames+3
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+13
+        rts
 
-    ;top left
-    lda player+PLAYER_X
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+3
+    @facing_left:
+        ; Start from tile 1 instead of tile 0
+        iny 
+        lda (selected_animation), y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 1
 
-    lda player+PLAYER_Y
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS
+        dey
+        lda (selected_animation), y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 5
 
-    ;;;;;;;;;;;;;;;;;;;;;;bottom left
-    clc
-    adc #$8 ; a already contains y
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+8
+        iny 
+        iny
+        iny
+        lda (selected_animation), y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 9
 
-    lda player + PLAYER_X
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+11
+        dey
+        lda (selected_animation), y
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 13
 
-
-
-
-    ;;;;;;;;;;;;;;;;;;;;top right
-    clc
-    adc #$8 ; a already contains x
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+7
-    lda #$00
-    
-    lda player + PLAYER_Y
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+4
-    
-
-
-    ;;;;;;;;;;;;;;;;;bottom right
-    clc
-    adc #$8 ; a lready contains y
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+12
-
-    lda player + PLAYER_X
-    clc
-    adc #$8
-    sta OAM_BUFFER_RAM+OAM_PLAYER_POS+15
-
-    rts
+        rts

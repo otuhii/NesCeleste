@@ -24,7 +24,7 @@
 game_info: 
     .res 2
 player: 
-    .res 8
+    .res 11
 previous_frame_controller:
     .res 1
 current_frame_controller:
@@ -47,6 +47,7 @@ new_frame_starts:
 
 
 .include "player.s"
+.include "physics.s"
 .include "input_handling.s"
 .include "startup.s"
 
@@ -55,14 +56,10 @@ main_loop:
     jsr wait_for_frame ; uppdating everything once per frame
 
     jsr read_controller
-    jsr update_player_physics
 
-    jsr update_player_state
-    jsr update_player_state_info
-
-    jsr select_player_animation
-    jsr advance_player_animation
-    jsr update_player_animation
+    jsr update_physics
+    
+    jsr update_player
 
     jmp main_loop
 
