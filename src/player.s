@@ -137,12 +137,25 @@ select_player_animation:
         sta selected_animation
         lda #>idle_frames ;loading high byte of the address
         sta selected_animation+1
+
+        lda #<idle_hair_offsets
+        sta selected_hair_offsets
+        lda #>idle_hair_offsets
+        sta selected_hair_offsets+1
+
         rts
     @running:
         lda #<run_frames
         sta selected_animation
         lda #>run_frames
         sta selected_animation+1
+
+        ;hair position offsets
+        lda #<run_hair_offsets
+        sta selected_hair_offsets
+        lda #>run_hair_offsets
+        sta selected_hair_offsets+1
+
         rts
     @dashing:
         lda #<dash_frames
@@ -180,13 +193,16 @@ select_player_hair_animation:
     cmp #STATE_FALLING
     beq @falling
 
+    cmp #STATE_RUNNING
+    beq @running
+
     @idle: 
         lda #<idle_hair_frames
         sta selected_hair_animation
         lda #>idle_hair_frames
         sta selected_hair_animation+1
         rts
-
+    @running:
     @dashing: ;not handled now
         lda #<dash_hair_frames
         sta selected_hair_animation
@@ -261,6 +277,8 @@ update_player_facing:
 update_player_oam:
     ;oam contains this order [top left] [top right] [bottom left] [bottom right]
     jsr update_player_oam_positions
+    jsr update_player_hair_oam_positions
+
     jsr update_player_oam_attributes
 
     jsr update_player_oam_tiles
@@ -273,50 +291,26 @@ update_player_oam:
 update_player_oam_positions:
     ;left column
     lda player + PLAYER_X
-
-    ;body
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 3
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 11
-    ;hair
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 19
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 27
 
     ;right column
     clc
     adc #$8
-
-    ;body
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 7
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 15
-    ;hair
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 23
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 31
-
-
 
     ;top row
     lda player + PLAYER_Y
-
-    ;body
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 0
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 4
-    ;hair
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 16
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 20
-    
 
 
     ;bottom row
     clc
     adc #8
-
-
-    ;body
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 8
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 12
-    ;hair
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 24
-    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 28
 
     rts
 
@@ -464,3 +458,71 @@ update_hair_oam_tiles:
         sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 29
 
         rts
+
+
+
+update_player_hair_oam_positions:
+    lda player + PLAYER_FRAME ; same as i choose offsets for sprite animation but here offset is 2
+    asl                       ; so we just multiply by 2
+    tay
+    
+    ;hair x with inverse offset if facing left
+    lda (selected_hair_offsets), y
+    tax
+
+    lda player + PLAYER_FLAGS
+    and #%00000001
+    beq @right
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;inverse x offset via two's complement
+    txa
+    eor #$FF ;inversing all the bits
+    clc
+    adc #1 ;adding one
+    jmp @apply
+
+    @right:
+        txa
+
+    @apply:
+        clc
+        adc player + PLAYER_X
+
+        ;left column
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 19
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 27
+
+        ;right column
+        clc
+        adc #$8
+
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 23
+        sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 31
+
+
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+    ;top row
+
+    iny
+    lda (selected_hair_offsets), y
+    clc
+    adc player + PLAYER_Y
+
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 16
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 20
+
+    ;bottom row
+    clc
+    adc #8
+
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 24
+    sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 28
+
+    rts

@@ -55,6 +55,25 @@ crouch_frames:
     .byte TILE_CROUCH_TL, TILE_CROUCH_TR
     .byte TILE_CROUCH_BL, TILE_CROUCH_BR
 
+idle_frame_count:
+    .byte 2
+idle_frame_duration:
+    .byte 20
+
+run_frame_count:
+    .byte 4
+run_frame_duration:
+    .byte 10
+
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;       HAIR            ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 idle_hair_frames:
     .byte TILE_HAIR_IDLE_TL, TILE_HAIR_IDLE_TR
     .byte TILE_HAIR_IDLE_BL, TILE_HAIR_IDLE_BR
@@ -67,13 +86,16 @@ dash_hair_frames:
     .byte TILE_HAIR_DASH_TL, TILE_HAIR_DASH_TR
     .byte TILE_HAIR_DASH_BL, TILE_HAIR_DASH_BR
 
+;;more offset may be added as i will use other animation states
+idle_hair_offsets:
+    .byte 0, 0      ;idle frame 0 
+    .byte 0, 1   ;idle frame 1, y in two's complement so 255 is -1
 
-idle_frame_count:
-    .byte 2
-idle_frame_duration:
-    .byte 20
+run_hair_offsets:
+    .byte 255, 255
+    .byte 255, 254
+    .byte 255, 0
+    .byte 255, 254
 
-run_frame_count:
-    .byte 4
-run_frame_duration:
-    .byte 10
+jump_hair_offsets:
+    .byte 0, 1
