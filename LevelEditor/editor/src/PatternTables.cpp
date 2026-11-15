@@ -31,8 +31,6 @@ PatternTables::Tile PatternTables::DecodeTile(std::size_t pattern_table_index, s
             //Bit number:  7 6 5 4 3 2 1 0
             const int bit {7 - tile_col};
 
-
-
             /* if we decode for column 2, we would have bit bit = 7 - 2 = 5
              * Initial byte is low = 10110010
              * When we shift to right by 5 we get 00000101

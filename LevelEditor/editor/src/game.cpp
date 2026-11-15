@@ -8,6 +8,8 @@ using namespace utils;
 
 void Start()
 {
+	g_editor_layout = CalculateEditorLayout();
+
 	g_Pattern_tables = std::make_unique<PatternTables>(
 		Parser::ParseChr("resources/pattern_table.chr")
 	); //expecting 8kb patterns that combines two pattern tables
@@ -20,11 +22,18 @@ void Draw()
 	uint8_t
 		pattern_table_index{0};
 
-	DrawPatternTable(
-		pattern_table_index,
-		Point2f{0.f, 0.f},
-		Point2f{400.f, 400.f}
-	);
+	// DrawPatternTable(
+	// 	pattern_table_index,
+	// 	Point2f{50.f, 50.f},
+	// 	Point2f{50.f+g_pattern_table_menu_size, 50.f+g_pattern_table_menu_size}
+	// );
+	SetColor(1.f, 1.f, 0.f, 1.f);
+	DrawRect(g_editor_layout.loadButton, 3.f);
+	DrawRect(g_editor_layout.saveButton, 3.f);
+	DrawRect(g_editor_layout.patternButton, 3.f);
+	DrawRect(g_editor_layout.nametable1, 3.f);
+	DrawRect(g_editor_layout.nametable2, 3.f);
+
 }
 
 void Update(float elapsedSec)
@@ -44,6 +53,7 @@ void End()
 // Called once when a key is pressed.
 void OnKeyDownEvent(SDL_Keycode key)
 {
+
 }
 
 // Called once when a key is released.
@@ -54,16 +64,33 @@ void OnKeyUpEvent(SDL_Keycode key)
 // Called whenever the mouse moves.
 void OnMouseMotionEvent(const SDL_MouseMotionEvent& e)
 {
+
 }
 
 // Called once when a mouse button is pressed.
 void OnMouseDownEvent(const SDL_MouseButtonEvent& e)
 {
+
 }
 
 // Called once when a mouse button is released.
 void OnMouseUpEvent(const SDL_MouseButtonEvent& e)
 {
+}
+
+EditorLayout CalculateEditorLayout()
+{
+	EditorLayout layout{};
+
+	const float
+		nametable_width{g_WindowWidth*0.5f};
+	const float
+		nametable_height{0.7f*g_WindowHeight};
+
+	layout.nametable1 = Rectf{0, 0, nametable_width, nametable_height};
+	layout.nametable2 = Rectf{nametable_width, 0, nametable_width, nametable_height};
+
+	return layout;
 }
 
 void DrawPatternTable(uint8_t pattern_table_index, const Point2f &startPos, const Point2f &endPos)

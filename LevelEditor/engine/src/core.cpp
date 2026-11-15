@@ -46,7 +46,7 @@ void Initialize()
 		QuitOnSDLError();
 	}
 
-	// Create an opengl context and attach it to the window 
+	// Create an opengl context and attach it to the window
 	g_pContext = SDL_GL_CreateContext(g_pWindow);
 	if (g_pContext == nullptr)
 	{
@@ -66,18 +66,55 @@ void Initialize()
 		SDL_GL_SetSwapInterval(0);
 	}
 
-	// Initialize Projection matrix
+	// // Initialize Projection matrix
+	// glMatrixMode(GL_PROJECTION);
+	// glLoadIdentity();
+	//
+	// // Set the clipping (viewing) area's left, right, top and top
+	// gluOrtho2D(0, g_WindowWidth, g_WindowHeight, 0);// y from top to top
+	//
+	// // The viewport is the rectangular region of the window where the image is drawn.
+	// // Set it to the entire client area of the created window
+	// glViewport(0, 0, static_cast<int>(g_WindowWidth), static_cast<int>(g_WindowHeight));
+	//
+	// //Initialize Modelview matrix
+	// glMatrixMode(GL_MODELVIEW);
+	// glLoadIdentity();
+	int windowWidth{};
+	int windowHeight{};
+
+	SDL_GetWindowSize(
+		g_pWindow,
+		&windowWidth,
+		&windowHeight
+	);
+
+	g_WindowWidth = static_cast<float>(windowWidth);
+	g_WindowHeight = static_cast<float>(windowHeight);
+
+	int drawableWidth{};
+	int drawableHeight{};
+
+	SDL_GL_GetDrawableSize(
+		g_pWindow,
+		&drawableWidth,
+		&drawableHeight
+	);
+
+	// Actual OpenGL framebuffer dimensions
+	glViewport(0, 0, drawableWidth, drawableHeight);
+
+	// Logical window coordinates
 	glMatrixMode(GL_PROJECTION);
 	glLoadIdentity();
 
-	// Set the clipping (viewing) area's left, right, top and top
-	gluOrtho2D(0, g_WindowWidth, g_WindowHeight, 0);// y from top to top
+	gluOrtho2D(
+		0.f,
+		g_WindowWidth,
+		g_WindowHeight,
+		0.f
+	);
 
-	// The viewport is the rectangular region of the window where the image is drawn.
-	// Set it to the entire client area of the created window
-	glViewport(0, 0, static_cast<int>(g_WindowWidth), static_cast<int>(g_WindowHeight));
-
-	//Initialize Modelview matrix
 	glMatrixMode(GL_MODELVIEW);
 	glLoadIdentity();
 

@@ -10,22 +10,50 @@
 
 std::string g_WindowTitle{ "NES Level Editor" };
 
-float g_WindowWidth{ 800.f };
-float g_WindowHeight{ 800.f };
+float g_WindowWidth{ 1600.f };
+float g_WindowHeight{ 1600.f };
 
 
 #pragma endregion gameInformation
 
 #pragma region myStructs
+enum class EditorStage{
+    nametable_set_value,
+    pick_pattern
+};
+
+struct EditorLayout
+{
+    Rectf nametable1{};
+    Rectf nametable2{};
+
+    Rectf loadButton{};
+    Rectf saveButton{};
+    Rectf patternButton{};
+};
+
 
 #pragma endregion
 
 #pragma region myVariables
 
-Nametable g_Nametable1{};
-Nametable g_Namatable2{};
-std::unique_ptr<PatternTables> g_Pattern_tables{};
+EditorLayout
+    g_editor_layout{};
 
+std::array<Nametable, 2>
+    g_name_tables{};
+
+std::unique_ptr<PatternTables>
+    g_Pattern_tables{};
+
+EditorStage
+    g_editor_stage{EditorStage::nametable_set_value};
+
+const float
+    g_pattern_table_menu_size{800.f};
+
+const std::string
+    g_export_path{};
 
 #pragma endregion
 
@@ -44,6 +72,8 @@ void OnMouseDownEvent(const SDL_MouseButtonEvent& e);
 void OnMouseUpEvent(const SDL_MouseButtonEvent& e);
 #pragma endregion inputHandling
 
+EditorLayout
+    CalculateEditorLayout();
 
 void DrawPatternTable(
     uint8_t pattern_table_index,
@@ -58,3 +88,4 @@ void DrawTile(
     float width,
     float height
 );
+
