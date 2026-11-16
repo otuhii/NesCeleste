@@ -83,7 +83,14 @@ clear_memory: ;0000 - 07ff
     bpl :- 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+; Initialize audio hardware
+ldx #<music_data_eb_02_2014b
+ldy #>music_data_eb_02_2014b
+lda #1                         ; 1 = NTSC
+jsr famistudio_init
 
+lda #0                         ; song index
+jsr famistudio_music_play
 ; setting up sprite range
 ;4014 - highest byte of the oam ram address, which tells the ppu that
 ;starting from that address, copy next 256 bytes, which in this case is $0200 - $02ff
