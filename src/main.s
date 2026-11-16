@@ -37,8 +37,10 @@ selected_hair_offsets:
     .res 2
 new_frame_starts:
     .res 1
-
-
+scroll:
+    .res 2
+ppuctrl_copy:
+    .res 1
 .segment "VECTORS"
 
     .addr nmi
@@ -53,6 +55,7 @@ new_frame_starts:
 .include "player.s"
 .include "physics.s"
 .include "input_handling.s"
+.include "scrolling.s"
 .include "startup.s"
 
 
@@ -63,6 +66,8 @@ main_loop:
 
     jsr update_physics
     
+    jsr update_scroll
+
     jsr update_player
 
     jmp main_loop

@@ -290,7 +290,9 @@ update_player_oam:
 
 update_player_oam_positions:
     ;left column
+    sec
     lda player + PLAYER_X
+    sbc scroll + SCROLL_X_COPY
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 3
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 11
 
@@ -489,6 +491,8 @@ update_player_hair_oam_positions:
     @apply:
         clc
         adc player + PLAYER_X
+        sec
+        sbc scroll + SCROLL_X_COPY
 
         ;left column
         sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 19
