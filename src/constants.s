@@ -1,5 +1,6 @@
 ; helpes to address different fields in player - player part in zero page
 ;       index via player + PLAYER_X to get access to x position e.g
+;memory offsets for zero page player
 PLAYER_X                = 0
 PLAYER_Y                = 1
 ;bautiful two's complement - https://www.youtube.com/watch?v=mEsAsRjeqto
