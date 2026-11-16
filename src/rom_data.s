@@ -97,5 +97,20 @@ run_hair_offsets:
     .byte 255, 0
     .byte 255, 254
 
-jump_hair_offsets:
-    .byte 0, 1
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;       COLLISION DATA          ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+collision_table:
+    ; Rows 0–27: empty
+    .repeat 224
+        .byte %00000000
+    .endrepeat
+
+    ; Rows 28–29: solid
+    .repeat 16
+        .byte %01010101
+    .endrepeat

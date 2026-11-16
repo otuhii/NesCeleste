@@ -5,7 +5,6 @@ load_rom_data:
     lda initial_game_info + SPAWN_POSITION_Y
     sta game_info + SPAWN_POSITION_Y
 
-
     ;loading palette data onto ppu
     ldx #$00
     @load_palettes:

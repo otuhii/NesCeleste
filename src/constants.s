@@ -14,6 +14,12 @@ PLAYER_MAX_FRAME_COUNT  = 7
 PLAYER_ANIM_TIMER       = 8
 PLAYER_ANIM_DURATION    = 9
 PLAYER_FLAGS            = 10
+
+;;player_aabb defined locally
+PLAYER_AABB_MIN_X       = 11 
+PLAYER_AABB_MIN_Y       = 12
+PLAYER_AABB_MAX_X       = 13
+PLAYER_AABB_MAX_Y       = 14
 ;0      0       0       0       0       0       0       0
 ;                                                      facing dir: 1 - facing left, 0 - facing right
 
@@ -24,6 +30,30 @@ STATE_JUMPING   = 2
 STATE_FALLING   = 3
 STATE_DASHING   = 4
 STATE_CROUCHING = 5
+
+
+
+PLAYER_AABB_LOCAL_OFFSET_X = 2
+PLAYER_AABB_LOCAL_OFFSET_Y = 1
+PLAYER_AABB_WIDTH = 12
+PLAYER_AABB_HEIGHT = 14
+
+
+
+;;; AABB parameter offsets for zero page collision_a and collision_b
+AABB_MIN_X = 0
+AABB_MIN_Y = 1
+AABB_MAX_X = 2
+AABB_MAX_Y = 3
+
+
+
+
+;;;;SOME PHYSICS CONSTANTS
+GRAVITY = 1
+MAX_FALL_SPEED = 4
+
+
 
 
 
@@ -41,6 +71,15 @@ OAM_BUFFER_RAM = $0200
 
 
 
+;;;;; will be storing environment map per nametable tile
+; on collisions for environment we just check the index input of that tile to find out 
+;                       if it is a solid or we die(spikes) or we just can continue moving
+TILE_EMPTY   = %00
+TILE_SOLID   = %01
+TILE_SPIKES  = %10
+TILE_NOSTATENOW = %11 ;not supported
+
+
 ;;;;;;;;;;;;;;;;;;;;;
 ;       SYSTEM      ;
 ;;;;;;;;;;;;;;;;;;;;;
@@ -54,3 +93,4 @@ BUTTON_UP_MASK      = %00001000
 BUTTON_DOWN_MASK    = %00000100
 BUTTON_LEFT_MASK    = %00000010
 BUTTON_RIGHT_MASK   = %00000001
+

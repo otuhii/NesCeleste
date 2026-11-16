@@ -23,20 +23,62 @@
 ;should remain constant over time, used for level reseting after player death
 game_info: 
     .res 2
+
+;SOME GENERAL STUFF
+new_frame_starts:
+    .res 1
 player: 
-    .res 11
+    .res 15
+
+;;;;INPUT
 previous_frame_controller:
     .res 1
 current_frame_controller:
     .res 1
+
+;;;;ANIMATIONS
 selected_animation: ; 16 bit address to rom predefined animation oam layouts
     .res 2
 selected_hair_animation:
     .res 2
 selected_hair_offsets:
     .res 2
-new_frame_starts:
+
+
+;;COLLISIONS
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;aabb object collisions;
+;;;;;;;;;;;;;;;;;;;;;;;;
+collision_a: 
+    .res 4
+collision_b: 
+    .res 4
+collision_result: 
     .res 1
+;;;;;;;;;;;;;;;;;;;;;;;;
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;environment index collisions with collision table;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+collision_start_tile_x: 
+    .res 1
+collision_end_tile_x:
+    .res 1
+collision_tile_y:
+    .res 1
+collision_byte_index:
+    .res 1
+collision_packed_byte:
+    .res 1
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+
 
 
 .segment "VECTORS"

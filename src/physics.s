@@ -1,5 +1,8 @@
-update_physics:
+.include "collisions.s"
 
+
+
+update_physics:
     jsr update_player_physics
     ;will combine some falling surroudings and stuff too
     rts
@@ -10,8 +13,15 @@ update_player_physics:
     jsr update_player_velocity
     jsr player_apply_gravity
 
+
     jsr move_player_horizontal
+    jsr resolve_horizontal_env_collisions ;using nametable index check from collision table in rom_data, 
+                                            ;2 bit per cell for fell possible variants of the cell
+
     jsr move_player_vertical
+    jsr resolve_vertical_env_collisions
+    
+    jsr check_player_objects_collisions ;using aabb
 
     rts
 
@@ -41,8 +51,22 @@ update_player_velocity:
 
     rts
 
+
+
+
 player_apply_gravity:
-    rts
+    lda player + PLAYER_VELOCITY_Y
+    cmp #MAX_FALL_SPEED
+    beq @done
+
+    clc 
+    adc #GRAVITY
+    sta player + PLAYER_VELOCITY_Y
+
+    @done:
+        rts
+
+
 
 move_player_horizontal:
     clc
@@ -53,4 +77,9 @@ move_player_horizontal:
     rts
 
 move_player_vertical:
+    clc
+    lda player + PLAYER_Y
+    adc player + PLAYER_VELOCITY_Y
+    sta player + PLAYER_Y
+
     rts
