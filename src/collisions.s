@@ -122,7 +122,12 @@ resolve_horizontal_env_collisions:
 
 
 resolve_vertical_env_collisions:
-    ;if zero not execute
+    ;before resolving our collisions set up grounded flag to 0
+    lda player + PLAYER_FLAGS
+    and #%11111101
+    sta player + PLAYER_FLAGS
+
+    ;if zero not execute    
     lda player + PLAYER_VELOCITY_Y
     beq @done
 
@@ -195,6 +200,12 @@ resolve_vertical_env_collisions:
 
     lda #$0
     sta player + PLAYER_VELOCITY_Y
+
+
+    lda player + PLAYER_FLAGS
+    ora #%00000010 ;grounded flag
+    sta player + PLAYER_FLAGS
+
 
     jmp @done
 

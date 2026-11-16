@@ -21,7 +21,9 @@ PLAYER_AABB_MIN_Y       = 12
 PLAYER_AABB_MAX_X       = 13
 PLAYER_AABB_MAX_Y       = 14
 ;0      0       0       0       0       0       0       0
-;                                                      facing dir: 1 - facing left, 0 - facing right
+;                                          grounded   facing dir: 
+;                                           flag      1 - facing left 
+;                                                     0 - facing right
 
 
 STATE_IDLE      = 0
@@ -52,9 +54,7 @@ AABB_MAX_Y = 3
 ;;;;SOME PHYSICS CONSTANTS
 GRAVITY = 1
 MAX_FALL_SPEED = 4
-JUMP_VELOCITY = 250
-
-
+JUMP_VELOCITY = 245
 
 
 
