@@ -95,3 +95,25 @@ BUTTON_DOWN_MASK    = %00000100
 BUTTON_LEFT_MASK    = %00000010
 BUTTON_RIGHT_MASK   = %00000001
 
+
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;       FAMISTUDIO     ;;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+FAMISTUDIO_CFG_EXTERNAL          = 1
+FAMISTUDIO_CFG_NTSC_SUPPORT      = 1
+FAMISTUDIO_CFG_SFX_SUPPORT       = 0
+FAMISTUDIO_CFG_DPCM_SUPPORT      = 0
+
+FAMISTUDIO_USE_FAMITRACKER_TEMPO = 1
+FAMISTUDIO_USE_VOLUME_TRACK      = 1
+FAMISTUDIO_USE_PITCH_TRACK       = 1
+FAMISTUDIO_USE_SLIDE_NOTES       = 1
+FAMISTUDIO_USE_DUTYCYCLE_EFFECT  = 1
+
+.define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE ; famistudio's zero-page variables
+.define FAMISTUDIO_CA65_RAM_SEGMENT  BSS      ; famistudio's regular ram variables
+.define FAMISTUDIO_CA65_CODE_SEGMENT CODE     ; famistudio's engine code in prg-rom

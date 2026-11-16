@@ -1,6 +1,3 @@
-.include "constants.s"
-
-
 .segment "HEADER";mesen helper, specifying memory layout and some other stuff
 
     ; iNES header
@@ -106,24 +103,7 @@ collision_tile_type:
 
 .segment "CODE"
 
-FAMISTUDIO_CFG_EXTERNAL          = 1
-FAMISTUDIO_CFG_NTSC_SUPPORT      = 1
-FAMISTUDIO_CFG_SFX_SUPPORT       = 0
-FAMISTUDIO_CFG_DPCM_SUPPORT      = 0
-
-FAMISTUDIO_USE_FAMITRACKER_TEMPO = 1
-FAMISTUDIO_USE_VOLUME_TRACK      = 1
-FAMISTUDIO_USE_PITCH_TRACK       = 1
-FAMISTUDIO_USE_SLIDE_NOTES       = 1
-FAMISTUDIO_USE_DUTYCYCLE_EFFECT  = 1
-
-.define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE
-.define FAMISTUDIO_CA65_RAM_SEGMENT  BSS
-.define FAMISTUDIO_CA65_CODE_SEGMENT CODE
-
-.include "famistudio_ca65.s"
-.segment "CODE"
-
+.include "constants.s"
 
 .include "player.s"
 .include "physics.s"
@@ -156,7 +136,15 @@ irq:
 .include "sync.s"
 
 .include "rom_data.s"
-.include "jazz.s"
+
+
+;;;;;;;;;;;;;;;
+;;;;;music;;;;;
+.include "audio_data/famistudio_ca65.s"
+.include "audio_data/jazz.s"
+;;;;;;;;;;;;;;
+
+
 
 .segment "CHARS"
     .incbin "visual_data/celeste.chr"
