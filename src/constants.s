@@ -15,7 +15,7 @@ PLAYER_ANIM_TIMER       = 8
 PLAYER_ANIM_DURATION    = 9
 PLAYER_FLAGS            = 10
 
-;;player_aabb defined locally
+;;player aabb values stored which define local offset from player position
 PLAYER_AABB_MIN_X       = 11 
 PLAYER_AABB_MIN_Y       = 12
 PLAYER_AABB_MAX_X       = 13
@@ -52,6 +52,7 @@ AABB_MAX_Y = 3
 ;;;;SOME PHYSICS CONSTANTS
 GRAVITY = 1
 MAX_FALL_SPEED = 4
+JUMP_VELOCITY = 250
 
 
 

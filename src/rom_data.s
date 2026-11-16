@@ -103,7 +103,7 @@ run_hair_offsets:
 ;;;;;;;;;       COLLISION DATA          ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-
+;will be changed as i will finish level editor
 collision_table:
     ; Rows 0–27: empty
     .repeat 224

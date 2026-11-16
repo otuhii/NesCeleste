@@ -14,9 +14,6 @@ check_aabb_collision:
 
 
 
-resolve_horizontal_env_collisions:
-
-    rts
 
 
 
@@ -29,13 +26,21 @@ check_player_objects_collisions:
 
 
 
+resolve_horizontal_env_collisions:
+
+    rts
+
+
+
+
+
+
 resolve_vertical_env_collisions:
+    ;if zero not execute
     lda player + PLAYER_VELOCITY_Y
     beq @done
-    bmi @upmove
 
-    ;downmove
-    ;checking only two bottom points
+    ;checking only two either two on top or two on bottom points
     ;but we need to check every index between those two points
     ;because 
     ;Environment tiles (8 pixels each):
@@ -64,6 +69,17 @@ resolve_vertical_env_collisions:
     lsr
     sta  collision_end_tile_x ;storing last index of col in collision_end_tile_x zero page
 
+
+
+
+
+    ;;;;;CHECKING WHETHER MOVING UP OR DOWN
+    lda player + PLAYER_VELOCITY_Y
+    bmi @upmove
+
+
+
+    ;downmove
     lda player + PLAYER_Y
     clc
     adc player + PLAYER_AABB_MAX_Y
@@ -96,9 +112,42 @@ resolve_vertical_env_collisions:
     lda #$0
     sta player + PLAYER_VELOCITY_Y
 
+    jmp @done
 
     @upmove:
+        lda player + PLAYER_Y
+        clc
+        adc player + PLAYER_AABB_MIN_Y
 
+        lsr ; three shifts right divide value by 8 thus we will get current 
+                ;index in which cell of nametable our player is remaining
+        lsr
+        lsr
+
+        sta collision_tile_y
+
+        jsr check_collision_result
+        cmp #TILE_SOLID
+        bne @done
+
+        ;convering tile row to pixel so we can place him 
+        ;on top of that platform that was hit
+        lda collision_tile_y
+        clc
+        adc #$1
+
+        asl
+        asl
+        asl ; y(index [0; 30])
+
+
+        ;player's local top offset
+        sec
+        sbc player + PLAYER_AABB_MIN_Y
+        sta player + PLAYER_Y
+
+        lda #$0
+        sta player + PLAYER_VELOCITY_Y
 
     @done:
         rts

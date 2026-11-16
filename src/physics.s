@@ -10,7 +10,10 @@ update_physics:
 
 
 update_player_physics:
-    jsr update_player_velocity
+    jsr update_player_velocity_x
+
+    jsr player_try_jump
+
     jsr player_apply_gravity
 
 
@@ -27,7 +30,7 @@ update_player_physics:
 
 
 
-update_player_velocity:
+update_player_velocity_x:
     lda current_frame_controller
     and #BUTTON_LEFT_MASK
     bne @left
@@ -52,6 +55,23 @@ update_player_velocity:
     rts
 
 
+
+player_try_jump:
+    lda current_frame_controller
+    and #BUTTON_A_MASK
+    beq @done
+
+    lda previous_frame_controller
+    and #BUTTON_A_MASK
+    bne @done
+
+
+    ;;;;TODO INTRODUCE GROUNDED FLAG HERE
+    lda #JUMP_VELOCITY
+    sta player + PLAYER_VELOCITY_Y
+
+    @done:
+        rts
 
 
 player_apply_gravity:

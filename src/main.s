@@ -66,13 +66,14 @@ collision_result:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;environment index collisions with collision table;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-collision_start_tile_x: 
+collision_start_tile_x: ;left corner x in tile indices range
     .res 1
-collision_end_tile_x:
+collision_end_tile_x: ;right corner x in tile indices range
     .res 1
-collision_tile_y:
+collision_tile_y: ;corner y value in tile indices rang 
     .res 1
-collision_byte_index:
+collision_byte_index: ; offset for collisition_table to get to byte that includes desired tile
+                                    ;(because info for one tile is only 2 bit)
     .res 1
 collision_packed_byte:
     .res 1
