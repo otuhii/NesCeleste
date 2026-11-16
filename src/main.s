@@ -66,16 +66,30 @@ collision_result:
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;environment index collisions with collision table;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+;vertical collision when y is fixed and we have range of x so we check all tiles spanned by player aabb
 collision_start_tile_x: ;left corner x in tile indices range
     .res 1
 collision_end_tile_x: ;right corner x in tile indices range
     .res 1
-collision_tile_y: ;corner y value in tile indices rang 
+collision_tile_y: ;corner y that picks either top or bottom of aabb
     .res 1
+
+;horizontal collision when x is fixed and we have range of y so we check all tiles spanned by player aabb
+collision_start_tile_y: ;top corner y in tile indices range
+    .res 1
+collision_end_tile_y: ;bottom curner y in tile indices range
+    .res 1
+collision_tile_x: ; ;x value that picks either right or left of aabb
+    .res 1
+
+
 collision_byte_index: ; offset for collisition_table to get to byte that includes desired tile
                                     ;(because info for one tile is only 2 bit)
     .res 1
 collision_packed_byte:
+    .res 1
+collision_tile_type:
     .res 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 

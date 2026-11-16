@@ -105,12 +105,23 @@ run_hair_offsets:
 
 ;will be changed as i will finish level editor
 collision_table:
-    ; Rows 0–27: empty
-    .repeat 224
-        .byte %00000000
+    ; Row 0: solid ceiling
+    .repeat 8
+        .byte %01010101
     .endrepeat
 
-    ; Rows 28–29: solid
-    .repeat 16
+    ; Rows 1–28: solid left and right walls
+    .repeat 28
+        .byte %01000000  ; First tile solid, other 3 empty
+
+        .repeat 6
+            .byte %00000000  ; 24 empty tiles
+        .endrepeat
+
+        .byte %00000001  ; First 3 empty, last tile solid
+    .endrepeat
+
+    ; Row 29: solid floor
+    .repeat 8
         .byte %01010101
     .endrepeat

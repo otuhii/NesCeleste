@@ -27,11 +27,97 @@ check_player_objects_collisions:
 
 
 resolve_horizontal_env_collisions:
+    ; if zero not execute
+    lda player + PLAYER_VELOCITY_X
+    beq @done
 
-    rts
+    ;same check as for vertical_collisions but we are checking not top and bottom but left and right
+    lda player + PLAYER_Y
+    clc
+    adc player + PLAYER_AABB_MIN_Y
+
+    lsr ;three shifts divide by 8 thus we get current index in range 0 30
+    lsr
+    lsr
+    sta collision_start_tile_y
+
+    lda player + PLAYER_Y
+    clc
+    adc player + PLAYER_AABB_MAX_Y
+    sec 
+    sbc #$1 ; aabb maximumm boundaries are exclusive so that is why subtracting one
+
+    lsr ;three shifts divide by 8 thus we get current index in range 0 30
+    lsr
+    lsr
+    sta collision_end_tile_y
 
 
+    ;checkign whether moving left or right
+    lda player + PLAYER_VELOCITY_X
+    bmi @leftmove
 
+    ;rightmove
+    lda player + PLAYER_X
+    clc
+    adc player + PLAYER_AABB_MAX_X
+    sec
+    sbc #$1
+
+    lsr
+    lsr
+    lsr
+    sta collision_tile_x
+
+    jsr check_solid_tiles_in_column
+    cmp #TILE_SOLID
+    bne @done
+
+    
+    lda collision_tile_x
+    asl
+    asl
+    asl ;converting x which is in 0 30 range to normal pixel values
+
+    sec
+    sbc player + PLAYER_AABB_MAX_X
+    sta player + PLAYER_X
+
+    lda #$0
+    sta player + PLAYER_VELOCITY_X
+    jmp @done
+
+    @leftmove:
+        lda player + PLAYER_X
+        clc
+        adc player + PLAYER_AABB_MIN_X
+
+        lsr
+        lsr
+        lsr
+        sta collision_tile_x
+
+        jsr check_solid_tiles_in_column
+        cmp #TILE_SOLID
+        bne @done
+        
+        lda collision_tile_x
+        clc
+        adc #1
+
+        asl
+        asl
+        asl ;converting x which is in 0 30 range to normal pixel values
+
+        sec
+        sbc player + PLAYER_AABB_MIN_X
+        sta player + PLAYER_X
+
+        lda #$0
+        sta player + PLAYER_VELOCITY_X
+
+    @done:
+        rts
 
 
 
@@ -71,8 +157,6 @@ resolve_vertical_env_collisions:
 
 
 
-
-
     ;;;;;CHECKING WHETHER MOVING UP OR DOWN
     lda player + PLAYER_VELOCITY_Y
     bmi @upmove
@@ -94,7 +178,7 @@ resolve_vertical_env_collisions:
     sta collision_tile_y
 
 
-    jsr check_collision_result
+    jsr check_solid_tiles_in_row
     cmp #TILE_SOLID
     bne @done
 
@@ -126,7 +210,7 @@ resolve_vertical_env_collisions:
 
         sta collision_tile_y
 
-        jsr check_collision_result
+        jsr check_solid_tiles_in_row
         cmp #TILE_SOLID
         bne @done
 
@@ -153,10 +237,12 @@ resolve_vertical_env_collisions:
         rts
 
 
+
+
 ; takes first xpos from collision_start_tile_x and iterates to last xpos from collision_end_tile_x register
 ; uses ypos from collision_tile_y register
 ; stores results in register a
-check_collision_result:
+check_solid_tiles_in_row:
     ldx collision_start_tile_x
     @loop:
         ldy collision_tile_y
@@ -182,6 +268,36 @@ check_collision_result:
         rts
 
 
+; takes first ypos from collision_start_tile_y and iterates to last xpos from collision_end_tile_y register
+; uses xpos from collision_tile_x register
+; stores results in register a
+check_solid_tiles_in_column:
+    ldy collision_start_tile_y
+    @loop:
+        ldx collision_tile_x
+        ;x = tile xpos
+        ;y = tile ypos
+        jsr get_collision_tile_type
+
+        cmp #TILE_SOLID
+        beq @solid
+
+        cpy collision_end_tile_y
+        beq @no_collision
+
+        iny
+        jmp @loop
+    @solid:
+        lda #TILE_SOLID
+        rts
+    @no_collision:
+        lda #TILE_EMPTY
+        rts
+
+
+    rts
+
+
 
 ;writes tile type into a based on x and y register
 get_collision_tile_type:
@@ -192,6 +308,7 @@ get_collision_tile_type:
 ;and to get x offset we need to x/4 because when index is 0-3 it will be 0 and so on and it fits our representation in bytes
                                                         ;that first byte is 0-3
     tya 
+    pha  ;preserve original tile y
     asl
     asl
     asl
@@ -247,6 +364,13 @@ get_collision_tile_type:
         lsr
     @tile3:
         and #%00000011
+
+        sta collision_tile_type
+
+        pla
+        tay ;restoring origin y so counter is saved and valid
+
+        lda collision_tile_type
         rts
 
     rts
