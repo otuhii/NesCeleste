@@ -70,7 +70,13 @@ SPAWN_POSITION_Y = 1
 OAM_PAGE = $02
 OAM_BUFFER_RAM = $0200
 
+;PPU registers
+PPUCTRL = $2000
+PPUSCROLL = $2005
 
+;scrolling
+SCROLL_X_COPY = 0
+SCROLL_Y_COPY = 1
 
 ;;;;; will be storing environment map per nametable tile
 ; on collisions for environment we just check the index input of that tile to find out 

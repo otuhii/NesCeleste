@@ -137,8 +137,13 @@ sta $2006 ;2006 - ppu read/write address - it requires two writes
 lda #$00                                  ; order - most and then least
 sta $2006
 
-
 jsr load_rom_data
+
+lda #0
+sta PPUSCROLL ; stores x
+sta PPUSCROLL ; stores y
+sta scroll + SCROLL_X_COPY
+sta scroll + SCROLL_Y_COPY
 
 jsr initialize_player
 
@@ -149,7 +154,8 @@ sta new_frame_starts
 cli
 
 lda #%10010000
-sta $2000 ;PPUCTRL
+sta PPUCTRL 
+sta ppuctrl_copy
 
 lda #%00011110
 sta $2001

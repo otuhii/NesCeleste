@@ -80,7 +80,6 @@ collision_end_tile_y: ;bottom curner y in tile indices range
 collision_tile_x: ; ;x value that picks either right or left of aabb
     .res 1
 
-
 collision_byte_index: ; offset for collisition_table to get to byte that includes desired tile
                                     ;(because info for one tile is only 2 bit)
     .res 1
@@ -94,6 +93,13 @@ nametable_read_ptr:
     .res 2 ;absolute memory address to help me read/write 1024 bytes of nametable
 
 
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;     SCROLLING     ;;;
+;;;;;;;;;;;;;;;;;;;;;;;;
+scroll:
+    .res 2
+ppuctrl_copy:
+    .res 1
 
 .segment "VECTORS"
 
@@ -110,6 +116,7 @@ nametable_read_ptr:
 .include "player.s"
 .include "physics.s"
 .include "input_handling.s"
+.include "scrolling.s"
 .include "startup.s"
 
 
@@ -122,6 +129,8 @@ main_loop:
 
     jsr update_physics
     
+    jsr update_scroll
+
     jsr update_player
 
     jmp main_loop
