@@ -10,8 +10,8 @@
 
 std::string g_WindowTitle{ "NES Level Editor" };
 
-float g_WindowWidth{ 2000.f };
-float g_WindowHeight{ 1000.f };
+float g_WindowWidth{ 2800.f };
+float g_WindowHeight{ 1300.f };
 
 
 #pragma endregion gameInformation
@@ -30,12 +30,24 @@ struct EditorLayout
     Rectf loadButton{};
     Rectf saveButton{};
     Rectf patternButton{};
+
+    Rectf patternMenu{};
 };
 
 
 #pragma endregion
 
 #pragma region myVariables
+
+constexpr uint32_t
+    tile_count_x{32};
+constexpr uint32_t
+    tile_count_y{30};
+
+const int
+    picked_pattern_table{0};
+int
+    picked_tile_index{3};
 
 EditorLayout
     g_editor_layout{};
@@ -50,7 +62,7 @@ EditorStage
     g_editor_stage{EditorStage::nametable_set_value};
 
 const float
-    g_pattern_table_menu_size{800.f};
+    g_pattern_table_menu_size{1000.f};
 
 const std::string
     g_export_path{};
@@ -89,3 +101,30 @@ void DrawTile(
     float height
 );
 
+bool CheckMouseRectCollision(
+    const Point2f &mouse_pos,
+    const Rectf& bounding_box
+);
+
+void DrawNametable(
+    const Nametable& nametable,
+    const Rectf& nametable_bounds
+);
+
+std::pair<int, int> DecodeNametableClickPosition(
+    const Point2f& click_pos,
+    const Rectf& nametable_bounds
+);
+
+std::pair<int, int> DecodePatterntableClickPosition(
+    const Point2f& click_pos
+);
+
+
+void Export();
+bool ExportCollisionTables();
+bool ExportNametables();
+
+void Import();
+bool ImportCollisionTables();
+bool ImportNametables();

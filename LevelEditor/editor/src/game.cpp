@@ -1,6 +1,7 @@
 #include "game.h"
 
 #include "userutils.h"
+#include <iostream>
 
 using namespace utils;
 
@@ -22,17 +23,29 @@ void Draw()
 	uint8_t
 		pattern_table_index{0};
 
-	// DrawPatternTable(
-	// 	pattern_table_index,
-	// 	Point2f{50.f, 50.f},
-	// 	Point2f{50.f+g_pattern_table_menu_size, 50.f+g_pattern_table_menu_size}
-	// );
+
 	SetColor(1.f, 0.f, 0.f, 1.f);
 	FillRect(g_editor_layout.loadButton);
 	SetColor(0.f, 1.f, 0.f, 1.f);
 	FillRect(g_editor_layout.saveButton);
 	SetColor(0.f, 0.f, 1.f, 1.f);
 	FillRect(g_editor_layout.patternButton);
+
+
+	DrawNametable(g_name_tables[0], g_editor_layout.nametable1);
+	DrawNametable(g_name_tables[1], g_editor_layout.nametable2);
+
+	if (g_editor_stage == EditorStage::pick_pattern)
+	{
+		SetColor(0.f, 0.f, 0.f, 0.4f);
+		FillRect(0.f, 0.f, g_WindowWidth, g_WindowHeight);
+
+		DrawPatternTable(
+			pattern_table_index,
+			Point2f{g_editor_layout.patternMenu.left,g_editor_layout.patternMenu.top},
+			Point2f{g_editor_layout.patternMenu.left+g_editor_layout.patternMenu.width, g_editor_layout.patternMenu.top+g_editor_layout.patternMenu.height}
+		);
+	}
 }
 
 void Update(float elapsedSec)
@@ -65,11 +78,69 @@ void OnMouseMotionEvent(const SDL_MouseMotionEvent& e)
 
 void OnMouseDownEvent(const SDL_MouseButtonEvent& e)
 {
+	const Point2f mouse_pos{
+		static_cast<float>(e.x), static_cast<float>(e.y)
+	};
 
+	if (g_editor_stage == EditorStage::nametable_set_value)
+	{
+		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.saveButton))
+		{
+			Export();
+		}
+
+		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.loadButton))
+		{
+			Import();
+		}
+
+		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.patternButton))
+		{
+			g_editor_stage = EditorStage::pick_pattern;
+		}
+
+		auto click_indices =
+			DecodeNametableClickPosition(mouse_pos, g_editor_layout.nametable1);
+
+		if (click_indices.first != -1 &&
+			click_indices.second != -1 &&
+			picked_tile_index < 256)
+		{
+			g_name_tables[0].tiles[click_indices.second * tile_count_x + click_indices.first] = picked_tile_index;
+		}
+
+		click_indices =
+			DecodeNametableClickPosition(mouse_pos, g_editor_layout.nametable2);
+		if (click_indices.first != -1 &&
+			click_indices.second != -1 &&
+			picked_tile_index < 256)
+		{
+			g_name_tables[1].tiles[click_indices.second * tile_count_x + click_indices.first] = picked_tile_index;
+		}
+	}
+	else if (g_editor_stage == EditorStage::pick_pattern)
+	{
+		if (!CheckMouseRectCollision(mouse_pos, g_editor_layout.patternMenu))
+		{
+			g_editor_stage = EditorStage::nametable_set_value;
+			return;
+		}
+		auto coords =
+			DecodePatterntableClickPosition(mouse_pos);
+
+		if (coords.first != -1 &&
+			coords.second != -1)
+		{
+			//have a variable for 16
+			picked_tile_index = coords.second * 16 + coords.first;
+			g_editor_stage = EditorStage::nametable_set_value;
+		}
+	}
 }
 
 void OnMouseUpEvent(const SDL_MouseButtonEvent& e)
 {
+
 }
 
 
@@ -87,8 +158,13 @@ EditorLayout CalculateEditorLayout()
 	const float nesWidth{256.f};
 	const float nesHeight{240.f};
 
-	const float windowWidth{g_WindowWidth};
-	const float windowHeight{g_WindowHeight};
+	const float windowWidth{
+		g_WindowWidth
+	};
+
+	const float windowHeight{
+		g_WindowHeight
+	};
 
 	const float availableWidth{
 		windowWidth - 2.f * margin
@@ -148,6 +224,11 @@ EditorLayout CalculateEditorLayout()
 		buttonHeight
 	};
 
+	layout.patternMenu.left = 50.f;
+	layout.patternMenu.top = 50.f;
+	layout.patternMenu.width = g_pattern_table_menu_size;
+	layout.patternMenu.height = g_pattern_table_menu_size;
+
 	return layout;
 }
 
@@ -172,8 +253,8 @@ void DrawPatternTable(uint8_t pattern_table_index, const Point2f &startPos, cons
 			};
 
 			const Point2f tilePos{
-				startPos.x + tile_col * tile_width,
-				startPos.y + tile_row * tile_height
+				startPos.x + static_cast<float>(tile_col) * tile_width,
+				startPos.y + static_cast<float>(tile_row) * tile_height
 			};
 
 			DrawTile(
@@ -235,6 +316,130 @@ void DrawTile(uint8_t pattern_table_index, uint8_t tile_index, const Point2f &st
 		}
 	}
 
+}
+
+bool CheckMouseRectCollision(const Point2f &mouse_pos, const Rectf& bounding_box)
+{
+	if (mouse_pos.x >= bounding_box.left &&
+		mouse_pos.x <= bounding_box.left+bounding_box.width &&
+		mouse_pos.y >= bounding_box.top &&
+		mouse_pos.y <= bounding_box.top+bounding_box.height)
+	{
+		return true;
+	}
+
+	return false;
+}
+
+
+
+void DrawNametable(const Nametable &nametable, const Rectf& nametable_bounds)
+{
+	const float
+		tile_width{nametable_bounds.width / tile_count_x};
+	const float
+		tile_height{nametable_bounds.height / tile_count_y};
+
+	for (int row{0}; row < tile_count_y; ++row)
+	{
+		for (int col{0}; col < tile_count_x; ++col)
+		{
+			const Point2f draw_point{
+				nametable_bounds.left + static_cast<float>(col) * tile_width,
+				nametable_bounds.top + static_cast<float>(row) * tile_height
+			};
+
+			DrawTile(
+				picked_pattern_table,
+				nametable.tiles[row * tile_count_x + col],
+				draw_point,
+				tile_width,
+				tile_height
+			);
+		}
+	}
+}
+
+std::pair<int, int> DecodeNametableClickPosition(
+	const Point2f &click_pos,
+	const Rectf& nametable_bounds
+)
+{
+	if (!CheckMouseRectCollision(click_pos, nametable_bounds))
+	{
+		return std::make_pair(-1, -1);
+	}
+
+	const Point2f local_pos{
+		click_pos.x - nametable_bounds.left,
+		click_pos.y - nametable_bounds.top
+	};
+
+	const float
+		tile_width{nametable_bounds.width / tile_count_x};
+	const float
+		tile_height{nametable_bounds.height / tile_count_y};
+
+	return std::make_pair(
+		static_cast<int>(std::floorf(local_pos.x/tile_width)),
+		static_cast<int>(std::floorf(local_pos.y/tile_height))
+	);
+}
+
+std::pair<int, int> DecodePatterntableClickPosition(
+	const Point2f &click_pos
+)
+{
+	if (!CheckMouseRectCollision(click_pos, g_editor_layout.patternMenu))
+	{
+		return std::make_pair(-1, -1);
+	}
+
+	const Point2f local_pos{
+		click_pos.x - g_editor_layout.patternMenu.left,
+		click_pos.y - g_editor_layout.patternMenu.top
+	};
+
+	const float
+		tile_dimensions{g_editor_layout.patternMenu.width / 16};
+
+	return std::make_pair(
+		static_cast<int>(std::floorf(local_pos.x/tile_dimensions)),
+		static_cast<int>(std::floorf(local_pos.y/tile_dimensions))
+	);
+
+}
+
+void Export()
+{
+	ExportCollisionTables();
+	ExportNametables();
+}
+
+bool ExportCollisionTables()
+{
+	return false;
+}
+
+bool ExportNametables()
+{
+	return false;
+}
+
+void Import()
+{
+	ImportCollisionTables();
+	ImportNametables();
+}
+
+bool ImportCollisionTables()
+{
+	return false;
+}
+
+bool ImportNametables()
+{
+	return false;
 }
 
 #pragma endregion inputHandling
