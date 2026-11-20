@@ -46,7 +46,7 @@ load_rom_data:
         inx
         ldy #$00
         
-        cpx #$4
+        cpx #$8
         bne @load_background_loop
 
     @end:

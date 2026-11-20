@@ -6,7 +6,7 @@
     .byte 2          ; 2 × 16 KB PRG = 32 KB
     .byte 1          ; 1 × 8 KB CHR = 8 KB
 
-    .byte $00        ; mapper 0, horizontal mirroring
+    .byte $01        ; mapper 0, horizontal mirroring
     .byte $00
 
     ; remaining bytes of 16-byte header
@@ -93,6 +93,7 @@ nametable_read_ptr:
     .res 2 ;absolute memory address to help me read/write 1024 bytes of nametable
 
 
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;     SCROLLING     ;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;
@@ -100,6 +101,8 @@ scroll:
     .res 2
 ppuctrl_copy:
     .res 1
+
+;;;;;;;;;;;;;;;;;;;;;;;;;
 
 .segment "VECTORS"
 
