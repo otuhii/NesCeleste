@@ -3,7 +3,7 @@ initial_game_info:
 
 
 palette_data:
-	.byte $3F, $3F, $3F, $3F 	;background palettes
+	.byte $2F, $30, $31, $21 	;background palettes
     .byte $00, $0A, $15, $01 	
     .byte $00, $29, $28, $27 	
     .byte $00, $34, $24, $14 	
@@ -12,7 +12,6 @@ palette_data:
     .byte $0F, $06, $36, $16	
     .byte $00, $0F, $30, $27	
     .byte $00, $3C, $2C, $1C 	
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -103,25 +102,8 @@ run_hair_offsets:
 ;;;;;;;;;       COLLISION DATA          ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;will be changed as i will finish level editor
 collision_table:
-    ; Row 0: solid ceiling
-    .repeat 8
-        .byte %01010101
-    .endrepeat
+    .incbin "visual_data/level_info/collisions.bin"
 
-    ; Rows 1–28: solid left and right walls
-    .repeat 28
-        .byte %01000000  ; First tile solid, other 3 empty
-
-        .repeat 6
-            .byte %00000000  ; 24 empty tiles
-        .endrepeat
-
-        .byte %00000001  ; First 3 empty, last tile solid
-    .endrepeat
-
-    ; Row 29: solid floor
-    .repeat 8
-        .byte %01010101
-    .endrepeat
+initial_nametable_info:
+    .incbin "visual_data/level_info/nametables.bin"

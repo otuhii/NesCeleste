@@ -90,6 +90,8 @@ collision_tile_type:
     .res 1
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
+nametable_read_ptr:
+    .res 2 ;absolute memory address to help me read/write 1024 bytes of nametable
 
 
 

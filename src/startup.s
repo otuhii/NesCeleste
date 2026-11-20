@@ -16,7 +16,41 @@ load_rom_data:
         cpx #$20 ; 32 possible palettes
         bne @load_palettes
 
-    rts
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;loading nametables and attibute tables onto ppu;;
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;maybe rewrite because i am not sure if writing this way is the best way
+    lda $2002 ; read resets write pair for $2005/$2006
+    lda #$20 ;high byte of address
+    sta $2006
+    lda #$00 ;low byte of address
+    sta $2006
+    ldx #$00
+
+    ;setting up zero page pointer to current write page
+    lda #<initial_nametable_info
+    sta nametable_read_ptr
+    lda #>initial_nametable_info
+    sta nametable_read_ptr+1
+
+    ldy #$00
+    ldx #$00
+    @load_background_loop:
+        lda (nametable_read_ptr), y
+        sta $2007
+
+        iny
+        bne @load_background_loop
+
+        inc nametable_read_ptr+1
+        inx
+        ldy #$00
+        
+        cpx #$4
+        bne @load_background_loop
+
+    @end:
+         rts
 
 
 
