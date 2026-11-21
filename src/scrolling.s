@@ -9,6 +9,7 @@ update_scroll:
         cmp #SCROLL_THRESHOLD; player x needs to be bigger than threshold to start scrolling horizontaly
         bcc @return
         
+        lda scroll + SCROLL_X_COPY
         cmp #255 ; max value for viewport so it does not wrap to the first nametable
         beq @return
         inc scroll + SCROLL_X_COPY
