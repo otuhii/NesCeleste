@@ -54,7 +54,7 @@ AABB_MAX_Y = 3
 
 ;;;;SOME PHYSICS CONSTANTS
 GRAVITY = 1
-MAX_FALL_SPEED = 4
+MAX_FALL_SPEED = 2
 JUMP_VELOCITY = 245
 
 
@@ -78,6 +78,8 @@ PPUSCROLL = $2005
 ;scrolling
 SCROLL_X_COPY = 0
 SCROLL_Y_COPY = 1
+
+SCROLL_THRESHOLD = 128
 
 ;;;;; will be storing environment map per nametable tile
 ; on collisions for environment we just check the index input of that tile to find out 

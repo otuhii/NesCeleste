@@ -1,0 +1,15 @@
+WIP:
+    make a proper mirroring, so you can go back
+    fix all boundaries issues
+
+
+TODO:
+    refactor code for collisions
+
+
+    refactor code for level editor
+
+    jump
+    wall crawling
+
+    good physics
