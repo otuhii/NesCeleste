@@ -1,6 +1,6 @@
 update_scroll:
     sec
-    lda player + PLAYER_X ; load player x coordinate
+    lda player + PLAYER_LOW_X ; load player x coordinate
     sbc scroll + SCROLL_X_COPY ; subtract it with the x of the viewport to get how far away from the left side the player is
     cmp #100 ; player x needs to be 100 to start scrolling horizontaly
     bcc @return

@@ -1,25 +1,26 @@
 ; helpes to address different fields in player - player part in zero page
-;       index via player + PLAYER_X to get access to x position e.g
+;       index via player + PLAYER_LOW_X to get access to x position e.g
 ;memory offsets for zero page player
-PLAYER_X                = 0
-PLAYER_Y                = 1
+PLAYER_LOW_X            = 0 ; because of scrolling i need to store world player position(0-511)
+PLAYER_HIGH_X           = 1    
+PLAYER_Y                = 2
 ;bautiful two's complement - https://www.youtube.com/watch?v=mEsAsRjeqto
-PLAYER_VELOCITY_X       = 2 ;signed integer - need to move later to fixed point numbers 
+PLAYER_VELOCITY_X       = 3 ;signed integer - need to move later to fixed point numbers 
                                                 ;that would be stored in two bytes i guess: one for frac and one for int 
-PLAYER_VELOCITY_Y       = 3 ;signed integer
-PLAYER_PREVIOUS_STATE   = 4
-PLAYER_CURRENT_STATE    = 5
-PLAYER_FRAME            = 6
-PLAYER_MAX_FRAME_COUNT  = 7
-PLAYER_ANIM_TIMER       = 8
-PLAYER_ANIM_DURATION    = 9
-PLAYER_FLAGS            = 10
+PLAYER_VELOCITY_Y       = 4 ;signed integer
+PLAYER_PREVIOUS_STATE   = 5
+PLAYER_CURRENT_STATE    = 6
+PLAYER_FRAME            = 7
+PLAYER_MAX_FRAME_COUNT  = 8
+PLAYER_ANIM_TIMER       = 9
+PLAYER_ANIM_DURATION    = 10
+PLAYER_FLAGS            = 11
 
 ;;player aabb values stored which define local offset from player position
-PLAYER_AABB_MIN_X       = 11 
-PLAYER_AABB_MIN_Y       = 12
-PLAYER_AABB_MAX_X       = 13
-PLAYER_AABB_MAX_Y       = 14
+PLAYER_AABB_MIN_X       = 12 
+PLAYER_AABB_MIN_Y       = 13
+PLAYER_AABB_MAX_X       = 14
+PLAYER_AABB_MAX_Y       = 15
 ;0      0       0       0       0       0       0       0
 ;                                          grounded   facing dir: 
 ;                                           flag      1 - facing left 

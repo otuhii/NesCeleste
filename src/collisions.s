@@ -29,7 +29,10 @@ check_player_objects_collisions:
 resolve_horizontal_env_collisions:
     ; if zero not execute
     lda player + PLAYER_VELOCITY_X
-    beq @done
+    ; beq @done - not working because @done label is further than 127 or -128 bytes
+    bne :+
+    rts
+    :
 
     ;same check as for vertical_collisions but we are checking not top and bottom but left and right
     lda player + PLAYER_Y
@@ -57,61 +60,131 @@ resolve_horizontal_env_collisions:
     lda player + PLAYER_VELOCITY_X
     bmi @leftmove
 
-    ;rightmove
-    lda player + PLAYER_X
-    clc
-    adc player + PLAYER_AABB_MAX_X
-    sec
-    sbc #$1
 
+    ;rightmove
+    lda player + PLAYER_AABB_MAX_X
+    sec
+    sbc #$1 ; aabb maximumm boundaries are exclusive so that is why subtracting one
+    clc
+    adc player + PLAYER_LOW_X
+    sta collision_world_x_low
+ 
+
+    lda player + PLAYER_HIGH_X
+    adc #$00
+    sta collision_world_x_high
+
+
+
+    lda collision_world_x_low
     lsr
     lsr
-    lsr
+    lsr ;dividing by 8 so we get index information
     sta collision_tile_x
 
+    lda collision_world_x_high
+    beq :+
+
+    lda collision_tile_x
+    ora #%00100000 ; our tile x is in world tile index format [0, 63]
+    sta collision_tile_x
+
+
+:
     jsr check_solid_tiles_in_column
     cmp #TILE_SOLID
     bne @done
 
     
     lda collision_tile_x
+    and #%00011111 ; not taking into account 'high' bit, just local 0 31
     asl
     asl
-    asl ;converting x which is in 0 30 range to normal pixel values
+    asl ;converting x which is in 0 63 range to normal pixel values
+
+    sta collision_world_x_low
+
+    lda collision_tile_x
+    lsr
+    lsr
+    lsr
+    lsr
+    lsr ;moving 5th bit into first one so we can just store it into the high byte of position
+
+    sta collision_world_x_high
+
 
     sec
+    lda collision_world_x_low
     sbc player + PLAYER_AABB_MAX_X
-    sta player + PLAYER_X
+    sta player + PLAYER_LOW_X
+
+    lda collision_world_x_high
+    sbc #$00
+    sta player + PLAYER_HIGH_X
 
     lda #$0
     sta player + PLAYER_VELOCITY_X
     jmp @done
 
     @leftmove:
-        lda player + PLAYER_X
+        lda player + PLAYER_LOW_X
         clc
         adc player + PLAYER_AABB_MIN_X
 
+        sta collision_world_x_low
+
+        lda player + PLAYER_HIGH_X
+        adc #$00
+        sta collision_world_x_high
+
+
+        lda collision_world_x_low
         lsr
         lsr
         lsr
         sta collision_tile_x
+        
+        lda collision_world_x_high
+        beq :+
 
+        lda collision_tile_x
+        ora #%00100000
+        sta collision_tile_x
+
+        :
         jsr check_solid_tiles_in_column
         cmp #TILE_SOLID
         bne @done
         
         lda collision_tile_x
         clc
-        adc #1
+        adc #1 ; taking next tile
+        sta collision_tile_x
 
+        and #%00011111
         asl
         asl
         asl ;converting x which is in 0 30 range to normal pixel values
 
+        sta collision_world_x_low
+
+        lda collision_tile_x
+        lsr
+        lsr
+        lsr
+        lsr
+        lsr
+        sta collision_world_x_high
+
         sec
+        lda collision_world_x_low
         sbc player + PLAYER_AABB_MIN_X
-        sta player + PLAYER_X
+        sta player + PLAYER_LOW_X
+
+        lda collision_world_x_high
+        sbc #$00
+        sta player + PLAYER_HIGH_X
 
         lda #$0
         sta player + PLAYER_VELOCITY_X
@@ -129,7 +202,10 @@ resolve_vertical_env_collisions:
 
     ;if zero not execute    
     lda player + PLAYER_VELOCITY_Y
-    beq @done
+    ; beq @done - not working because @done is further than -128; 127 bytes
+    bne :+
+    rts
+    :
 
     ;checking only two either two on top or two on bottom points
     ;but we need to check every index between those two points
@@ -138,30 +214,58 @@ resolve_vertical_env_collisions:
     ;|  Tile 0  |  Tile 1  |  Tile 2  |
     ;      [------ Player ------]
     ;          12 pixels wide
-    lda player + PLAYER_X
+    lda player + PLAYER_LOW_X
     clc
     adc player + PLAYER_AABB_MIN_X
+    sta collision_world_x_low
+
+    lda player + PLAYER_HIGH_X
+    adc #$00
+    sta collision_world_x_high
     
+    lda collision_world_x_low
     lsr ; three shifts right divide value by 8 thus we will get current 
             ;index in which cell of nametable our player is remaining
     lsr
     lsr
     sta collision_start_tile_x ; storing first index of col in collision_start_tile_x
 
-    lda player + PLAYER_X
-    clc
-    adc player + PLAYER_AABB_MAX_X
+    lda collision_world_x_high
+    beq :+
+
+    lda collision_start_tile_x
+    ora #%00100000
+    sta collision_start_tile_x
+    
+    :
+
+    lda player + PLAYER_AABB_MAX_X
     sec 
     sbc #$1 ; aabb maximumm boundaries are exclusive so that is why subtracting one
 
+    clc
+    adc player + PLAYER_LOW_X
+    sta collision_world_x_low
+
+    lda player + PLAYER_HIGH_X
+    adc #$00
+    sta collision_world_x_high
+
+    lda collision_world_x_low
     lsr ; three shifts right divide value by 8 thus we will get current 
             ;index in which cell of nametable our player is remaining
     lsr
     lsr
     sta  collision_end_tile_x ;storing last index of col in collision_end_tile_x zero page
 
+    lda collision_world_x_high
+    beq :+
 
+    lda collision_end_tile_x
+    ora #%00100000
+    sta collision_end_tile_x
 
+    :
     ;;;;;CHECKING WHETHER MOVING UP OR DOWN
     lda player + PLAYER_VELOCITY_Y
     bmi @upmove
@@ -326,6 +430,7 @@ get_collision_tile_type:
     sta collision_byte_index; y * 8
 
     txa ; x / 4
+    and #%00011111
     lsr
     lsr
 
@@ -333,12 +438,24 @@ get_collision_tile_type:
     adc collision_byte_index
     tay ; we store our y * 8 + int(x / 4) in y register
 
-    lda collision_table, y ; adding our y * 8 + int(x/4) offset to our table so we get byte that includes our desired tile
-    sta collision_packed_byte ;byte contains values for 4 tiles
+
+    txa 
+    and #%00100000
+    bne @table2
+
+    @table1:
+        lda collision_table_0, y ; adding our y * 8 + int(x/4) offset to our table so we get byte that includes our desired tile
+        jmp @accessing
+    
+    @table2:
+        lda collision_table_1, y
+    
+    @accessing:
+        sta collision_packed_byte ;byte contains values for 4 tiles
     
     ;;;;;;;;;;;;;;;
     ;;;;decoding;;;
-    ;;;;;;;;;;;;;;
+    ;;;;;;;;;;;;;;;
 
 
     ;;;;;determining tile position within the byte using % division

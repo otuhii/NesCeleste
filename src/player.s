@@ -1,7 +1,9 @@
 initialize_player:
 ; setting up position to spawn point
     lda game_info + SPAWN_POSITION_X 
-    sta player + PLAYER_X
+    sta player + PLAYER_LOW_X ;only spawning player in the first nametable/collision table
+    lda #$00
+    sta player + PLAYER_HIGH_X
     lda game_info + SPAWN_POSITION_Y
     sta player + PLAYER_Y
 
@@ -309,7 +311,7 @@ update_player_oam:
 update_player_oam_positions:
     ;left column
     sec
-    lda player + PLAYER_X
+    lda player + PLAYER_LOW_X
     sbc scroll + SCROLL_X_COPY
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 3
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 11
@@ -508,7 +510,7 @@ update_player_hair_oam_positions:
 
     @apply:
         clc
-        adc player + PLAYER_X
+        adc player + PLAYER_LOW_X
         sec
         sbc scroll + SCROLL_X_COPY
 

@@ -4,7 +4,7 @@
 
 update_physics:
     jsr update_player_physics
-    ;will combine some falling surroudings and stuff too
+    ; will combine some falling surroudings and stuff too
     rts
 
 
@@ -74,7 +74,7 @@ player_try_jump:
     sta player + PLAYER_VELOCITY_Y
 
     lda player + PLAYER_FLAGS
-    and #%11111110
+    and #%11111101
     sta player + PLAYER_FLAGS
 
     @done:
@@ -96,12 +96,26 @@ player_apply_gravity:
 
 
 move_player_horizontal:
+    lda player + PLAYER_LOW_X
     clc
-    lda player + PLAYER_X
     adc player + PLAYER_VELOCITY_X
-    sta player + PLAYER_X
+    sta player + PLAYER_LOW_X
+    
+    lda player + PLAYER_VELOCITY_X ; if a velocity would be negative we need to account for moving backwards
+                                    ;if position is 0100 and velocity is FF(-1) we dont want to have 01FF but we want to have 00FF
+    bmi @negative
+    @positive:
+        lda player + PLAYER_HIGH_X
+        adc #$00
+        jmp @done
+    @negative:
+        lda player + PLAYER_HIGH_X
+        adc #$ff ;if carry is 1 we would get 0
+                ;if carry is 0 we would get -1(ff)
+    @done:
+        sta player + PLAYER_HIGH_X
+        rts
 
-    rts
 
 move_player_vertical:
     clc

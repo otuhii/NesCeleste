@@ -25,7 +25,7 @@ game_info:
 new_frame_starts:
     .res 1
 player: 
-    .res 15
+    .res 16
 
 ;;;;INPUT
 previous_frame_controller:
@@ -58,11 +58,13 @@ collision_result:
 
 
 
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;environment index collisions with collision table;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+collision_world_x_low:
+    .res 1
+collision_world_x_high:
+    .res 1
 
 ;vertical collision when y is fixed and we have range of x so we check all tiles spanned by player aabb
 collision_start_tile_x: ;left corner x in tile indices range
@@ -87,6 +89,10 @@ collision_packed_byte:
     .res 1
 collision_tile_type:
     .res 1
+
+collision_table: ; depending in which nametables our player is, we will apply some offset to the collision look up
+    .res 1
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 nametable_read_ptr:

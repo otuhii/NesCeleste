@@ -102,8 +102,11 @@ run_hair_offsets:
 ;;;;;;;;;       COLLISION DATA          ;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-collision_table:
-    .incbin "visual_data/level_info/collisions.bin"
+collision_table_0:
+    .incbin "visual_data/level_info/collisions.bin", 0, 240
+
+collision_table_1:
+    .incbin "visual_data/level_info/collisions.bin", 240, 240
 
 initial_nametable_info:
     .incbin "visual_data/level_info/nametables.bin"
