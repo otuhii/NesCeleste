@@ -101,7 +101,7 @@ void OnKeyUpEvent(SDL_Keycode key)
 	}
 	else if (key == SDLK_s)
 	{
-		g_show_collisions = true;
+		g_show_collisions = !g_show_collisions;
 	}
 }
 
@@ -120,12 +120,12 @@ void OnMouseDownEvent(const SDL_MouseButtonEvent& e)
 	{
 		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.saveButton))
 		{
-			Export();
+			Parser::ExportLevelInfo("../../src/", g_name_tables);
 		}
 
 		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.loadButton))
 		{
-			Import();
+			Parser::ImportLevelInfo("resources/", g_name_tables);
 		}
 
 		if (CheckMouseRectCollision(mouse_pos, g_editor_layout.patternButton))
@@ -171,7 +171,6 @@ void OnMouseUpEvent(const SDL_MouseButtonEvent& e)
 {
 
 }
-
 
 
 //vibe coded layout jumpscare
@@ -459,115 +458,7 @@ std::pair<int, int> DecodePatterntableClickPosition(
 
 }
 
-void Export()
-{
-	const bool collisionsExported{
-		ExportCollisionTables()
-	};
 
-	const bool nametablesExported{
-		ExportNametables()
-	};
-
-	if (collisionsExported && nametablesExported)
-	{
-		std::cout << "Export successful\n";
-	}
-	else
-	{
-		std::cerr << "Export failed\n";
-	}
-}
-
-bool ExportCollisionTables()
-{
-	std::filesystem::create_directories(g_export_path);
-	std::ofstream file{
-		g_export_path+"collisions.bin",
-		std::ios::binary
-	};
-
-	if (!file)
-	{
-		std::cerr << "Failed to open collision export file\n";
-		return false;
-	}
-
-	for (const Nametable& nametable : g_name_tables)
-	{
-		const auto encoded{
-			EncodeCollisionTables(nametable)
-		};
-
-		file.write(
-			reinterpret_cast<const char*>(encoded.data()),
-			encoded.size()
-		);
-
-		if (!file)
-			return false;
-	}
-
-	return true;
-}
-
-bool ExportNametables()
-{
-	std::filesystem::create_directories(g_export_path);
-
-
-	std::ofstream file{
-		g_export_path+"nametables.bin",
-		std::ios::binary
-	};
-
-	if (!file)
-	{
-		std::cerr << "Failed to open nametable export file\n";
-		return false;
-	}
-
-	for (const Nametable& nametable : g_name_tables)
-	{
-		file.write(
-			reinterpret_cast<const char*>(nametable.tiles.data()),
-			static_cast<std::streamsize>(nametable.tiles.size())
-		);
-
-		if (!file)
-			return false;
-
-		const auto attributes{
-			EncodeAttributes(nametable)
-		};
-
-		file.write(
-			reinterpret_cast<const char*>(attributes.data()),
-			static_cast<std::streamsize>(attributes.size())
-		);
-
-		if (!file)
-			return false;
-	}
-
-	return true;
-}
-
-void Import()
-{
-	ImportCollisionTables();
-	ImportNametables();
-}
-
-bool ImportCollisionTables()
-{
-	return false;
-}
-
-bool ImportNametables()
-{
-	return false;
-}
 
 
 void CyclePalette(Nametable& nametable, int tileX, int tileY)
@@ -680,82 +571,7 @@ void DrawCollisionOverlay(
 
 std::array<uint8_t, 240> EncodeCollisionTables(const Nametable& nametable)
 {
-	std::array<uint8_t, 240> encoded{};
 
-	constexpr int tilesPerByte{4};
-
-	for (int y{0}; y < tile_count_y; ++y)
-	{
-		for (int x{0}; x < tile_count_x; ++x)
-		{
-			const uint32_t tileIndex{
-				y * tile_count_x + x
-			};
-
-			const uint32_t byteIndex{
-				y * (tile_count_x / tilesPerByte) + x / tilesPerByte
-			};
-
-			const int shift{
-				(tilesPerByte - 1 - (x % tilesPerByte)) * 2
-			};
-
-			const uint8_t collisionType{
-				static_cast<uint8_t>(nametable.collisionTypes[tileIndex])
-			};
-
-			encoded[byteIndex] |=
-				static_cast<uint8_t>((collisionType & 0x03) << shift);
-		}
-	}
-
-	return encoded;
-}
-
-std::array<uint8_t, 64> EncodeAttributes(const Nametable& nametable)
-{
-	std::array<uint8_t, 64> encoded{};
-
-	constexpr int attributeWidth{8};
-	constexpr int paletteRegionsPerRow{16};
-	constexpr int paletteRegionRows{15};
-
-	for (int y{0}; y < 8; ++y)
-	{
-		for (int x{0}; x < 8; ++x)
-		{
-			uint8_t attribute{0};
-
-			for (int quadrantY{0}; quadrantY < 2; ++quadrantY)
-			{
-				for (int quadrantX{0}; quadrantX < 2; ++quadrantX)
-				{
-					const int paletteX{x * 2 + quadrantX};
-					const int paletteY{y * 2 + quadrantY};
-
-					if (paletteY >= paletteRegionRows)
-						continue;
-
-					const uint8_t paletteIndex{
-						nametable.palettes[
-							paletteY * paletteRegionsPerRow + paletteX
-						]
-					};
-
-					const int shift{
-						(quadrantY * 2 + quadrantX) * 2
-					};
-
-					attribute |=
-						static_cast<uint8_t>((paletteIndex & 0x03) << shift);
-				}
-			}
-
-			encoded[y * attributeWidth + x] = attribute;
-		}
-	}
-
-	return encoded;
 }
 
 #pragma endregion inputHandling

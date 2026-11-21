@@ -18,6 +18,9 @@ enum class CollisionType : uint8_t
 
 struct Nametable
 {
+    inline static uint32_t const tile_count_x_{32};
+    inline static uint32_t const tile_count_y_{30};
+    
     std::array<uint8_t, 960> tiles;    // 960 values, each 0–255
     std::array<CollisionType, 960> collisionTypes{};
     std::array<uint8_t, 240> palettes; // 240 values, each 0–3

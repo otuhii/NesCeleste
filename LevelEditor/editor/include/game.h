@@ -84,8 +84,7 @@ EditorStage
 const float
     g_pattern_table_menu_size{1000.f};
 
-const std::string
-    g_export_path{"../../src/visual_data/"};
+
 
 #pragma endregion
 
@@ -146,14 +145,6 @@ void CyclePalette(
     int tileX, int tileY
 );
 
-void Export();
-bool ExportCollisionTables();
-bool ExportNametables();
-
-void Import();
-bool ImportCollisionTables();
-bool ImportNametables();
-
 void CycleCollision(
     Nametable& nametable,
     int tileX,
@@ -172,6 +163,4 @@ void DrawCollisionOverlay(
     const Rectf& bounds
 );
 
-std::array<uint8_t, 240> EncodeCollisionTables(const Nametable& nametable);
 
-std::array<uint8_t, 64> EncodeAttributes(const Nametable& nametable);
