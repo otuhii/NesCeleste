@@ -8,8 +8,8 @@
 #include <vector>
 #include <cinttypes>
 
-#include "defines.h"
 #include "PatternTables.h"
+#include "LevelData.h"
 
 class Parser {
 public:
