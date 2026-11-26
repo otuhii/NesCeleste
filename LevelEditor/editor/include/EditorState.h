@@ -14,7 +14,8 @@ enum class EditorStage{
 enum class EditorTool
 {
     Tiles,
-    Collisions
+    Collisions,
+    Eraser
 };
 
 struct EditorState

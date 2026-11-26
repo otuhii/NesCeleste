@@ -49,6 +49,19 @@ std::optional<EditorCommand> EditorInputHandler::OnKeyUp(
             };
             break;
         }
+        case SDLK_DELETE:
+        {
+            return EditorCommand{
+                ClearAllNametables{}
+            };
+            break;
+        }
+        case SDLK_e:
+        {
+            return EditorCommand{
+                ChangeTool{EditorTool::Eraser}
+            };
+        }
         default:
             return std::nullopt;
             break;
@@ -92,8 +105,6 @@ std::optional<EditorCommand> EditorInputHandler::HandleNametableClick(
         static_cast<float>(event.y)
     };
 
-
-
     for (std::size_t nametable_index{}; nametable_index < layout.nametable_bounds.size(); ++nametable_index)
     {
         const Rectf& current_nametable_bounds{
@@ -123,6 +134,16 @@ std::optional<EditorCommand> EditorInputHandler::HandleNametableClick(
                 };
             }
             return std::nullopt;
+        }
+
+        if (state.tool == EditorTool::Eraser)
+        {
+            if (event.button == SDL_BUTTON_LEFT)
+            {
+                return EditorCommand{
+                    ChangeTile{nametable_index, x, y, Nametable::defalt_nametable_index_}
+                };
+            }
         }
 
         if (event.button == SDL_BUTTON_LEFT)

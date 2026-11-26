@@ -2,7 +2,6 @@
 #include "LevelEditor.h"
 
 
-
 inline std::string      g_WindowTitle{ "NES Level Editor" };
 inline float            g_WindowWidth{ 2800.f };
 inline float            g_WindowHeight{ 1300.f };

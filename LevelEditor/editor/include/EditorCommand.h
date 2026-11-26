@@ -52,6 +52,9 @@ struct ChangeCollisionVisibility {
     bool visible{};
 };
 
+struct ChangeToEraseMode{};
+struct ClearAllNametables{};
+
 struct SaveLevel{};
 struct LoadLevel{};
 
@@ -66,7 +69,8 @@ using EditorCommand = std::variant<
     ChangeSelectedTile,
     ChangePatternTable,
     ChangeTool,
-    ChangeCollisionVisibility
+    ChangeCollisionVisibility,
+    ClearAllNametables
 >;
 
 #endif //LEVELEDITOR_EDITORCOMMAND_H

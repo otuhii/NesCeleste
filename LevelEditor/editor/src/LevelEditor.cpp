@@ -151,6 +151,13 @@ void LevelEditor::ExecuteCommand(const EditorCommand &command)
             level_.nametables
         );
     }
+    else if (const auto* clear_nametables{std::get_if<ClearAllNametables>(&command)})
+    {
+        for (Nametable& nametable : level_.nametables)
+        {
+            nametable.EmptyContents();
+        }
+    }
 }
 
 

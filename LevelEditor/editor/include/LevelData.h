@@ -5,6 +5,7 @@
 #ifndef LEVELEDITOR_LEVELDATA_H
 #define LEVELEDITOR_LEVELDATA_H
 #include <array>
+#include <cassert>
 #include <cstdint>
 
 
@@ -18,12 +19,23 @@ enum class CollisionType : uint8_t
 
 struct Nametable
 {
-    std::array<uint8_t, 960> tiles;    // 960 values, each 0–255
-    std::array<CollisionType, 960> collisionTypes{};
+    static constexpr uint32_t defalt_nametable_index_{0};
+    static constexpr uint32_t tile_count_x_{32};
+    static constexpr uint32_t tile_count_y_{30};
+    static constexpr uint32_t tile_count_{tile_count_x_ * tile_count_y_};
+
+    std::array<uint8_t, tile_count_> tiles;    // 960 values, each 0–255
+    std::array<CollisionType, tile_count_> collisionTypes{};
     std::array<uint8_t, 240> palettes; // 240 values, each 0–3
 
-    inline static uint32_t const tile_count_x_{32};
-    inline static uint32_t const tile_count_y_{30};
+    void EmptyContents()
+    {
+        for (std::size_t index{}; index < tiles.size(); ++index)
+        {
+            tiles[index] = defalt_nametable_index_;
+            collisionTypes[index] = CollisionType::Empty;
+        }
+    }
 };
 
 struct Level
