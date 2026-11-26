@@ -4,9 +4,9 @@ initial_game_info:
 
 palette_data:
 	.byte $2F, $30, $31, $21 	;background palettes
-    .byte $00, $0A, $15, $01 	
-    .byte $00, $29, $28, $27 	
-    .byte $00, $34, $24, $14 	
+    .byte $0F, $30, $3d, $2d 	
+    .byte $0f, $39, $29, $19 	
+    .byte $0f, $37, $16, $06 	
 
 	.byte $3E, $14, $37, $2C	;sprite palettes
     .byte $0F, $06, $36, $16	

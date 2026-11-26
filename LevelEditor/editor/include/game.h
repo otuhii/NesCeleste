@@ -5,7 +5,7 @@
 inline std::string      g_WindowTitle{ "NES Level Editor" };
 inline float            g_WindowWidth{ 2800.f };
 inline float            g_WindowHeight{ 1300.f };
-inline float constexpr  g_Pattern_table_menu_size{1000.f};
+inline float constexpr  g_Pattern_table_menu_size{800.f};
 
 inline LevelEditor g_Level_editor{};
 
