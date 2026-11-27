@@ -189,8 +189,8 @@ clear_memory: ;0000 - 07ff
 jsr title_screen ; do title screen stuff
 
 ; Initialize audio hardware
-ldx #<music_data_eb_02_2014b
-ldy #>music_data_eb_02_2014b
+ldx #<music_data_ch1
+ldy #>music_data_ch1
 lda #1                         ; 1 = NTSC
 jsr famistudio_init
 

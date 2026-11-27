@@ -120,6 +120,28 @@ ppuctrl_copy:
 
 .segment "CODE"
 
+FAMISTUDIO_CFG_EXTERNAL          = 1
+FAMISTUDIO_CFG_NTSC_SUPPORT      = 1
+FAMISTUDIO_CFG_SFX_SUPPORT       = 0
+FAMISTUDIO_CFG_DPCM_SUPPORT      = 0
+
+FAMISTUDIO_USE_PITCH_TRACK       = 1
+FAMISTUDIO_USE_FAMITRACKER_TEMPO = 1
+FAMISTUDIO_USE_FAMITRACKER_DELAYED_NOTES_OR_CUTS = 1
+FAMISTUDIO_USE_VOLUME_TRACK = 1
+FAMISTUDIO_USE_VOLUME_SLIDES = 1
+FAMISTUDIO_USE_SLIDE_NOTES = 1
+FAMISTUDIO_USE_NOISE_SLIDE_NOTES = 1
+FAMISTUDIO_USE_VIBRATO = 1
+FAMISTUDIO_USE_DUTYCYCLE_EFFECT = 1
+
+.define FAMISTUDIO_CA65_ZP_SEGMENT   ZEROPAGE
+.define FAMISTUDIO_CA65_RAM_SEGMENT  BSS
+.define FAMISTUDIO_CA65_CODE_SEGMENT CODE
+
+.include "audio_data/famistudio_ca65.s"
+.segment "CODE"
+
 .include "constants.s"
 
 .include "player.s"
@@ -156,15 +178,7 @@ irq:
 .include "sync.s"
 
 .include "rom_data.s"
-
-
-;;;;;;;;;;;;;;;
-;;;;;music;;;;;
-.include "audio_data/famistudio_ca65.s"
-.include "audio_data/jazz.s"
-;;;;;;;;;;;;;;
-
-
+.include "audio_data/song.s"
 
 .segment "CHARS"
     .incbin "visual_data/celeste.chr"
