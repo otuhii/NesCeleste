@@ -66,9 +66,6 @@ run_frame_duration:
 
 
 
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;       HAIR            ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -107,6 +104,11 @@ collision_table_0:
 
 collision_table_1:
     .incbin "visual_data/level_info/collisions.bin", 240, 240
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;           NAMETABLES               ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 initial_nametable_info:
     .incbin "visual_data/level_info/nametables.bin"
