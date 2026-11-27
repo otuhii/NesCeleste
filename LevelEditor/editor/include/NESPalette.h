@@ -1,18 +1,11 @@
 //
-// Created by otuhii on 11/7/26.
+// Created by otuhii on 11/22/26.
 //
 
-#ifndef LEVELEDITOR_DEFINES_H
-#define LEVELEDITOR_DEFINES_H
+#ifndef LEVELEDITOR_NESPALETTE_H
+#define LEVELEDITOR_NESPALETTE_H
 #include <array>
-#include <cinttypes>
-
-
-struct Nametable
-{
-    std::array<uint8_t, 960> tiles;    // 960 values, each 0–255
-    std::array<uint8_t, 240> palettes; // 240 values, each 0–3
-};
+#include <cstdint>
 
 using Palette = std::array<uint8_t, 4>;
 
@@ -49,4 +42,5 @@ constexpr std::array<uint32_t, 64> NES_PALETTE =
     0xB5EBF2, 0xB8B8B8, 0x000000, 0x000000
 };
 
-#endif //LEVELEDITOR_DEFINES_H
+
+#endif //LEVELEDITOR_NESPALETTE_H

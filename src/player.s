@@ -1,7 +1,9 @@
 initialize_player:
 ; setting up position to spawn point
     lda game_info + SPAWN_POSITION_X 
-    sta player + PLAYER_X
+    sta player + PLAYER_LOW_X ;only spawning player in the first nametable/collision table
+    lda #$00
+    sta player + PLAYER_HIGH_X
     lda game_info + SPAWN_POSITION_Y
     sta player + PLAYER_Y
 
@@ -20,8 +22,22 @@ initialize_player:
     sta player + PLAYER_ANIM_TIMER
 
 
+    ;setting up aabb values
+    lda #PLAYER_AABB_LOCAL_OFFSET_X
+    sta player + PLAYER_AABB_MIN_X
+    lda #PLAYER_AABB_LOCAL_OFFSET_Y
+    sta player + PLAYER_AABB_MIN_Y
+
+    lda #(PLAYER_AABB_WIDTH + PLAYER_AABB_LOCAL_OFFSET_X)
+    sta player + PLAYER_AABB_MAX_X
+    lda #(PLAYER_AABB_HEIGHT + PLAYER_AABB_LOCAL_OFFSET_Y)
+    sta player + PLAYER_AABB_MAX_Y
+
+    ;;;;;;
+
     jsr update_player_state_info
     jsr select_player_animation
+    jsr select_player_hair_animation
     jsr update_player_oam
     
     rts
@@ -55,21 +71,28 @@ update_player_state:
     lda player + PLAYER_CURRENT_STATE
     sta player + PLAYER_PREVIOUS_STATE
 
-    lda #STATE_IDLE
-    sta player + PLAYER_CURRENT_STATE
-    
-    lda current_frame_controller
-    and #(BUTTON_LEFT_MASK | BUTTON_RIGHT_MASK)
-    beq @done
+    lda player + PLAYER_VELOCITY_Y
+    bmi @jumping ; load 7 most signifiicat bit to negative register, 
+                 ;so basically suitable for two's complement neg value check
+    bne @falling
 
-    lda #STATE_RUNNING
-    sta player + PLAYER_CURRENT_STATE
-    rts
+    lda player + PLAYER_VELOCITY_X
+    bne @running
 
-
-    @done:
+    @idle:
+        lda #STATE_IDLE
+        jmp @store
+    @jumping:
+        lda #STATE_JUMPING
+        jmp @store
+    @falling:
+        lda #STATE_FALLING
+        jmp @store
+    @running:
+        lda #STATE_RUNNING
+    @store:
+        sta player + PLAYER_CURRENT_STATE
         rts
-
 
 
 
@@ -212,9 +235,9 @@ select_player_hair_animation:
 
     @falling: ;not handled now
         lda #<fall_hair_frames
-        sta select_player_animation
+        sta selected_hair_animation
         lda #>fall_hair_frames
-        sta select_player_animation+1
+        sta selected_hair_animation+1
         rts
 
 
@@ -251,11 +274,8 @@ advance_player_animation:
 
 update_player_facing:
     lda player + PLAYER_VELOCITY_X
-
     beq @done
-    
-    and #%10000000 ;checking sign of the velocity: if 1 it is negative value
-    bne @left 
+    bmi @left
 
     @right:
         lda player + PLAYER_FLAGS
@@ -290,7 +310,9 @@ update_player_oam:
 
 update_player_oam_positions:
     ;left column
-    lda player + PLAYER_X
+    sec
+    lda player + PLAYER_LOW_X
+    sbc scroll + SCROLL_X_COPY
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 3
     sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 11
 
@@ -488,7 +510,9 @@ update_player_hair_oam_positions:
 
     @apply:
         clc
-        adc player + PLAYER_X
+        adc player + PLAYER_LOW_X
+        sec
+        sbc scroll + SCROLL_X_COPY
 
         ;left column
         sta OAM_BUFFER_RAM + OAM_PLAYER_POS + 19
@@ -503,9 +527,6 @@ update_player_hair_oam_positions:
 
 
     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-
-
-
 
 
     ;top row

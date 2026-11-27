@@ -1,18 +1,17 @@
 initial_game_info:
-    .byte $50, $50 ; spawn position x and y
+    .byte $60, $50 ; spawn position x and y
 
 
 palette_data:
-	.byte $3F, $3F, $3F, $3F 	;background palettes
-    .byte $00, $0A, $15, $01 	
-    .byte $00, $29, $28, $27 	
-    .byte $00, $34, $24, $14 	
+	.byte $2F, $30, $21, $11 	;background palettes
+    .byte $0F, $30, $3d, $2d 	
+    .byte $0f, $39, $29, $19 	
+    .byte $0f, $37, $16, $06 	
 
 	.byte $3E, $14, $37, $2C	;sprite palettes
     .byte $0F, $06, $36, $16	
     .byte $00, $0F, $30, $27	
     .byte $00, $3C, $2C, $1C 	
-
 
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -67,9 +66,6 @@ run_frame_duration:
 
 
 
-
-
-
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;;;       HAIR            ;;;;
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -97,5 +93,25 @@ run_hair_offsets:
     .byte 255, 0
     .byte 255, 254
 
-jump_hair_offsets:
-    .byte 0, 1
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;;;;;;       COLLISION DATA          ;;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+collision_table_0:
+    .incbin "visual_data/level_info/collisions.bin", 0, 240
+
+collision_table_1:
+    .incbin "visual_data/level_info/collisions.bin", 240, 240
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;;           NAMETABLES               ;;;;
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+initial_nametable_info:
+    .incbin "visual_data/level_info/nametables.bin"
+    
+title_screen_nametable_info:
+    .incbin "visual_data/title_screen_nametables.bin"

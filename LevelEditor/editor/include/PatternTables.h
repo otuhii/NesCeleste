@@ -22,6 +22,8 @@ public:
     [[nodiscard]]
     Tile DecodeTile(std::size_t pattern_table_index, std::size_t tile_index) const;
 
+
+    static uint8_t constexpr tile_count_{16};
 private:
     std::vector<uint8_t> binary_data_;
 };

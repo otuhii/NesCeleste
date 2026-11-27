@@ -18,8 +18,6 @@
 
 # OPTIONAL
 
-Music
-
 Strawberry pickups for points
 
 Extra dash pickup
