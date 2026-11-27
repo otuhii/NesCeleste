@@ -110,3 +110,6 @@ collision_table_1:
 
 initial_nametable_info:
     .incbin "visual_data/level_info/nametables.bin"
+    
+title_screen_nametable_info:
+    .incbin "visual_data/title_screen_nametables.bin"
